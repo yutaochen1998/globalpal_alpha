@@ -1,4 +1,6 @@
-var express=require("express"); 
+#!/usr/bin/env node
+
+var express=require("express");
 var bodyParser=require("body-parser"); 
 var mongoose = require('mongoose');
 var fs = require('fs');
