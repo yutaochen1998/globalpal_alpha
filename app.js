@@ -13,7 +13,7 @@ mongoose.connect('mongodb+srv://yc9841:chen2yu3tao1@yc001-0ofxw.azure.mongodb.ne
 var db=mongoose.connection; 
 db.on('error', console.log.bind(console, "connection error")); 
 db.once('open', function() {
-    console.log("connection succeeded"); 
+    console.log("connection succeeded");
 });
   
 var app=express();
