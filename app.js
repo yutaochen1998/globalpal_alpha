@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-var express=require("express");
-var bodyParser=require("body-parser"); 
-var mongoose = require('mongoose');
-var fs = require('fs');
-var session = require('express-session');
+const express = require("express");
+const bodyParser = require("body-parser");
+const mongoose = require('mongoose');
+const fs = require('fs');
+const session = require('express-session');
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
@@ -12,14 +12,14 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 mongoose.connect('mongodb+srv://yc9841:chen2yu3tao1@yc001-0ofxw.azure.mongodb.net/test?retryWrites=true&w=majority');
 
-var db=mongoose.connection; 
+const db = mongoose.connection;
 db.on('error', console.log.bind(console, "connection error")); 
 db.once('open', function() {
     console.log("connection succeeded");
 });
-  
-var app=express();
-  
+
+const app = express();
+
 app.use(express.static(__dirname));  
 app.use(bodyParser.json()); 
 app.use(express.static('public'));
@@ -35,8 +35,8 @@ app.set('view engine', 'ejs');
 
 app.post('/login', function(req, res) {
 
-    var email = req.body.email_login; 
-    var password = req.body.password_login; 
+	const email = req.body.email_login;
+	const password = req.body.password_login;
 
 	db.collection('Test').find({email: email}).toArray(function(err, result) {
 		if (err) throw err;
@@ -69,17 +69,17 @@ app.get('/login_page', function(req, res) {
 });
 
 app.post('/signup', function(req, res) {
-	
-    var firstname = req.body.firstname_signup;
-	var lastname = req.body.lastname_signup;
-    var email = req.body.email_signup; 
-    var password = req.body.password_signup; 
-    var phone = req.body.phone_signup; 
+
+	const firstname = req.body.firstname_signup;
+	const lastname = req.body.lastname_signup;
+	const email = req.body.email_signup;
+	const password = req.body.password_signup;
+	const phone = req.body.phone_signup;
 	
 	db.collection('Test').find({$or: [{email: email}, {phone: phone}]}).toArray(function(err, result) {
 		if (err) throw err;
 		if (result.length === 0) {
-			var new_account = { 
+			const new_account = {
 				firstname: firstname, 
 				lastname: lastname, 
 				email: email, 
@@ -116,7 +116,7 @@ app.get('/signup_page', function(req, res) {
 	res.render('signup_page');
 });
 
-var port = 3000;
+const port = 3000;
 app.get('/', function(req, res) {
 	res.set({ 
 		'Access-Control-Allow-Origin': '*'
