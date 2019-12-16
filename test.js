@@ -1,4 +1,5 @@
 const suite = require('mocha').suite;
+const test = require('mocha').test;
 const assert = require('assert');
 
 function increment (number) {
