@@ -1,71 +1,49 @@
-<!DOCTYPE html>
-<html lang="en"> 
-	<head> 
-		<meta charset="utf-8">
-		<title>Signup</title> 
-         
-		<link rel="stylesheet" 
-			href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
-			integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" 
-			crossorigin="anonymous">
+<% layout('layout_general') -%>
+<% stylesheet('../stylesheets/style.css') -%>
 
-		<link rel="stylesheet" type="text/css" href="../stylesheets/style.css">
-	</head> 
+<br>
+<br>
+<br>
+<div class="container" >
+	<div class="row">
+		<div class="col-lg-3">
+		</div>
 
-	<body class="general_page">
-	
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<div class="col-lg-6 main">
+			<form action="/signup" method="post">
+				<h1>Signup</h1>
 
-		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" 
-			integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" 
-			crossorigin="anonymous">
-		</script>
+				<label for="firstname_signup">First Name</label>
+				<input class="box" type="text" id="firstname_signup"
+					   name="firstname_signup" placeholder="David" required /><br>
 
-		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" 
-			integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" 
-			crossorigin="anonymous">
-		</script>
-	
-		<br> 
-		<br> 
-		<br> 
-		<div class="container" > 
-			<div class="row"> 
-				<div class="col-lg-3"> 
-				</div>
-				
-				<div class="col-lg-6 main"> 
-					<form action="/signup" method="post"> 
-						<h1>Signup</h1> 
-						
-						<input class="box" type="text" id="firstname_signup" 
-							name="firstname_signup" placeholder="First Name" required /><br> 
-						
-						<input class="box" type="text" id="lastname_signup" 
-							name="lastname_signup" placeholder="Last Name" required /><br> 
-                              
-						<input class="box" type="email" id="email_signup" 
-							name="email_signup" placeholder="E-Mail" required /><br> 
-                              
-						<input class="box" type="password" id="password_signup" 
-							name="password_signup" placeholder="Password" required /><br> 
-                              
-						<input class="box" type="text" id="phone_signup"  
-							name="phone_signup" placeholder="Phone Number" required /><br><br>
-						
-						<input type="submit" id="submit_signup"  
-							value="Submit" /><br>
-					</form>
-					
-					<form action="/" method="get">
-						<input type="submit" id="signup_page_return2home"
-							value="Return">
-					</form>
-				</div>
-				
-				<div class="col-lg-3"> 
-				</div> 
-			</div> 
-		</div> 
-	</body> 
-</html>
+				<label for="lastname_signup">Last Name</label>
+				<input class="box" type="text" id="lastname_signup"
+					   name="lastname_signup" placeholder="Smith" required /><br>
+
+				<label for="email_signup">E-Mail</label>
+				<input class="box" type="email" id="email_signup"
+					   name="email_signup" placeholder="explame@123.com" required /><br>
+
+				<label for="password_signup">Password</label>
+				<input class="box" type="password" id="password_signup"
+					   name="password_signup" placeholder="Enter your password" required /><br>
+
+				<label for="phone_signup">Phone</label>
+				<input class="box" type="text" id="phone_signup"
+					   name="phone_signup" placeholder="07421234567" required /><br><br>
+
+				<input type="submit" id="submit_signup"
+					   value="Submit" /><br>
+			</form>
+
+			<form action="/" method="get">
+				<input type="submit" id="signup_page_return2home"
+					   value="Return">
+			</form>
+		</div>
+
+		<div class="col-lg-3">
+		</div>
+	</div>
+</div>

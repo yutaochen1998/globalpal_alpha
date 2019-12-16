@@ -1,18 +1,18 @@
 .main{ 
-    padding:20px; 
+    padding: 20px;
     font-family: 'Helvetica', serif; 
     box-shadow: 5px 5px 7px 5px #888888; 
 }
 
 h1 { 
     font-size: 40px; 
-    text-align:center; 
+    text-align: center;
     font-family: 'Helvetica', serif; 
 } 
 
-p {
+p, label {
 	font-size: 20px; 
-    text-align:center; 
+    text-align: center;
     font-family: 'Helvetica', serif; 
 }
 
