@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+//import modules
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
@@ -7,20 +8,24 @@ const fs = require('fs');
 const session = require('express-session');
 const engine = require('ejs-locals');
 
+//configure mongodb connection
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 mongoose.connect('mongodb+srv://yc9841:chen2yu3tao1@yc001-0ofxw.azure.mongodb.net/test?retryWrites=true&w=majority');
 
+//set up mongodb connection
 const db = mongoose.connection;
 db.on('error', console.log.bind(console, "connection error")); 
 db.once('open', function() {
     console.log("connection succeeded");
 });
 
+//express app instance
 const app = express();
 
+//configure express app
 app.use(express.static(__dirname));  
 app.use(bodyParser.json()); 
 app.use(express.static('public'));
@@ -32,10 +37,12 @@ app.use(session({
   cookie: {secure: false}
 }));
 
+//set view engine as 'ejs-locals'
 app.engine('ejs', engine);
 app.set('views',__dirname + '/views');
 app.set('view engine', 'ejs');
 
+//handle login request
 app.post('/login', function(req, res) {
 
 	let email = req.body.email_login;
@@ -60,10 +67,12 @@ app.post('/login', function(req, res) {
 	});
 });
 
+//render login page
 app.get('/login_page', function(req, res) {
 	res.render('login_page', {title: 'Login'});
 });
 
+//handle signup request
 app.post('/signup', function(req, res) {
 
 	let firstname = req.body.firstname_signup;
@@ -104,10 +113,12 @@ app.post('/signup', function(req, res) {
 	});
 });
 
+//render signup page
 app.get('/signup_page', function(req, res) {
 	res.render('signup_page', {title: 'Sign up'});
 });
 
+//show homepage
 const port = 3000;
 app.get('/', function(req, res) {
 	res.set({ 
@@ -115,5 +126,5 @@ app.get('/', function(req, res) {
 	});
 	res.render('welcome_page', {title: 'Welcome to GlobalPal!'});
 }).listen(port, function() {
-	console.log("server listening at port " + port);
+	console.log("Server listening at port " + port);
 });

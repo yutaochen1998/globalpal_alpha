@@ -6,7 +6,7 @@ function increment (number) {
     return number + 1;
 }
 
-suite("Pipeline test", function() {
+suite("demo test", function() {
     test("increment() increases the value by 1", function () {
         let a = 1;
         let b = 2;
