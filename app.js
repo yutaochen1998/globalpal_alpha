@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const session = require('express-session');
 const engine = require('ejs-locals');
+const crypto = require('crypto');
 
 //configure mongodb connection
 mongoose.set('useNewUrlParser', true);
@@ -19,7 +20,7 @@ mongoose.connect('mongodb+srv://yc9841:chen2yu3tao1@yc001-0ofxw.azure.mongodb.ne
 const db = mongoose.connection;
 db.on('error', console.log.bind(console, "connection error")); 
 db.once('open', function() {
-    console.log("connection succeeded");
+    console.log("Connection succeeded.");
 });
 
 //express app instance
@@ -48,12 +49,13 @@ app.post('/login', function(req, res) {
 	let email = req.body.email_login;
 	let password = req.body.password_login;
 
-	db.collection('Test').find({email: email}).toArray(function (err, result) {
+	db.collection('Accounts').find({email: email}).toArray(function (err, result) {
 		if (err) throw err;
 		if (result.length === 0) {
 			console.log("Account doesn't exists!");
 			res.render('login_failed', {title: 'Login failed', error_message: "Account doesn't exists!"});
 		} else {
+			password = crypto.createHmac('sha1', password).update(password).digest('hex');
 			if (result[0].password !== password) {
 				console.log("Password incorrect!");
 				res.render('login_failed', {title: 'Login failed', error_message: "Password incorrect!"});
@@ -61,7 +63,7 @@ app.post('/login', function(req, res) {
 				req.session.userID = email;
 				console.log("Login successful!");
 				console.log("userID: " + req.session.userID);
-				res.render('start_friendship', {title: 'GlobalPal', user_name: result[0].firstname});
+				res.render('start_friendship', {title: 'GlobalPal', user_name: result[0].firstName});
 			}
 		}
 	});
@@ -75,17 +77,20 @@ app.get('/login_page', function(req, res) {
 //handle signup request
 app.post('/signup', function(req, res) {
 
-	let firstname = req.body.firstname_signup;
-	let lastname = req.body.lastname_signup;
+	let firstName = req.body.firstname_signup;
+	let lastName = req.body.lastname_signup;
 	let email = req.body.email_signup;
 	let password = req.body.password_signup;
 	let phone = req.body.phone_signup;
 
-	db.collection('Test').find({$or: [{email: email}, {phone: phone}]}).toArray(function (err, result) {
+	db.collection('Accounts').find({$or: [{email: email}, {phone: phone}]}).toArray(function (err, result) {
 		if (result.length === 0) {
+
+			password = crypto.createHmac('sha1', password).update(password).digest('hex');
+
 			let new_account = {
-				firstname: firstname,
-				lastname: lastname,
+				firstName: firstName,
+				lastName: lastName,
 				email: email,
 				password: password,
 				phone: phone,
@@ -97,11 +102,11 @@ app.post('/signup', function(req, res) {
 				country: "secret",
 				city: "secret",
 				job: "secret",
-				sexualorientation: "secret",
-				personaldescription: "secret",
-				facebooklink: "secret",
+				sexualOrientation: "secret",
+				personalDescription: "secret",
+				facebookLink: "secret",
 			};
-			db.collection('Test').insertOne(new_account, function(err) {
+			db.collection('Accounts').insertOne(new_account, function(err) {
 				if (err) throw err;
 				console.log("Account registered Successfully!");
 			});
