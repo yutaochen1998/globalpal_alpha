@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
 const fs = require('fs');
 const session = require('express-session');
+const engine = require('ejs-locals');
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
@@ -31,6 +32,8 @@ app.use(session({
   cookie: {secure: false}
 }));
 
+app.engine('ejs', engine);
+app.set('views',__dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.post('/login', function(req, res) {
