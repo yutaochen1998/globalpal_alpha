@@ -35,55 +35,47 @@ app.set('view engine', 'ejs');
 
 app.post('/login', function(req, res) {
 
-	const email = req.body.email_login;
-	const password = req.body.password_login;
+	let email = req.body.email_login;
+	let password = req.body.password_login;
 
-	db.collection('Test').find({email: email}).toArray(function(err, result) {
+	db.collection('Test').find({email: email}).toArray(function (err, result) {
 		if (err) throw err;
-		if (result.length === 0) {
+		if (result[0].length === 0) {
 			console.log("Account doesn't exists!");
-			//res.redirect('/html/login_failed.html');
 			res.render('login_failed', {error_message: "Account doesn't exists!"});
 		} else {
 			if (result[0].password !== password) {
 				console.log("Password incorrect!");
-				//res.redirect('/html/login_failed.html');
 				res.render('login_failed', {error_message: "Password incorrect!"});
 			} else {
 				req.session.userID = email;
 				console.log("Login successful!");
 				console.log("userID: " + req.session.userID);
-				//res.redirect('/html/start_friendship.html');
 				res.render('start_friendship', {name: result[0].firstname});
-				//res.sendFile('/html/start_friendship.html', {root: __dirname })
-				//res.json({userID: req.session.userID});
-				//res.end();
 			}
 		}
 	});
 });
 
 app.get('/login_page', function(req, res) {
-	//res.redirect('/html/login_page.html');
 	res.render('login_page');
 });
 
 app.post('/signup', function(req, res) {
 
-	const firstname = req.body.firstname_signup;
-	const lastname = req.body.lastname_signup;
-	const email = req.body.email_signup;
-	const password = req.body.password_signup;
-	const phone = req.body.phone_signup;
-	
-	db.collection('Test').find({$or: [{email: email}, {phone: phone}]}).toArray(function(err, result) {
-		if (err) throw err;
-		if (result.length === 0) {
-			const new_account = {
-				firstname: firstname, 
-				lastname: lastname, 
-				email: email, 
-				password: password, 
+	let firstname = req.body.firstname_signup;
+	let lastname = req.body.lastname_signup;
+	let email = req.body.email_signup;
+	let password = req.body.password_signup;
+	let phone = req.body.phone_signup;
+
+	db.collection('Test').find({$or: [{email: email}, {phone: phone}]}).toArray(function (err, result) {
+		if (result[0].length === 0) {
+			let new_account = {
+				firstname: firstname,
+				lastname: lastname,
+				email: email,
+				password: password,
 				phone: phone,
 				//bellow are reserved as placeholder
 				profile: {data: fs.readFileSync('images/default_profile.png'), contentType: 'image/png'},
@@ -98,21 +90,18 @@ app.post('/signup', function(req, res) {
 				facebooklink: "secret",
 			};
 			db.collection('Test').insertOne(new_account, function(err) {
-				if (err) throw err; 
-				console.log("Account inserted Successfully!"); 
-			}); 
-			//res.redirect('/html/signup_successful.html');
+				if (err) throw err;
+				console.log("Account inserted Successfully!");
+			});
 			res.render('signup_successful');
 		} else {
 			console.log("Account exists!");
-			//res.redirect('/html/signup_failed.html');
 			res.render('signup_failed');
 		}
 	});
 });
 
 app.get('/signup_page', function(req, res) {
-	//res.redirect('/html/signup_page.html');
 	res.render('signup_page');
 });
 
@@ -121,7 +110,6 @@ app.get('/', function(req, res) {
 	res.set({ 
 		'Access-Control-Allow-Origin': '*'
 	});
-	//res.redirect('/html/welcome_page.html');
 	res.render('welcome_page', {name: 'Yutao'});
 }).listen(port, function() {
 	console.log("server listening at port " + port);
