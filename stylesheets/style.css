@@ -11,15 +11,24 @@ h1 {
 } 
 
 p, label {
-	font-size: 20px; 
-    text-align: center;
+	font-size: 20px;
     font-family: 'Helvetica', serif; 
+}
+
+p.message {
+    text-align: center;
+}
+
+.profile_photo_top_left {
+    max-width: 75px;
+    max-height: 75px;
+    margin: 10px 10px;
+    border: 3px solid #73AD21;
 }
 
 #welcome_title {
 	font-family: Century Gothic,CenturyGothic,AppleGothic,sans-serif;
-	font-size: 60px; 
-	text-align:center;
+	font-size: 60px;
 	color: white;
 	text-shadow: 5px 5px 10px black;
 }
@@ -57,4 +66,9 @@ input[type=submit] {
     padding: 16px 32px; 
     margin: 4px 2px; 
     border-radius: 10px; 
+}
+
+#logout {
+    width: 140px;
+    background-color: #73AD21;
 }

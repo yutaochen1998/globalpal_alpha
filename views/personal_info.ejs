@@ -1,0 +1,16 @@
+<% layout('layout_general') -%>
+<% stylesheet('../stylesheets/style.css') -%>
+
+<table style="width:1px">
+    <tr>
+        <th>
+            <img src="data:<%= content_type %>;base64,<%= profile_photo %>" class="profile_photo_top_left">
+        </th>
+        <th>
+            <form action="/logout" method="get">
+                <input type="submit" id="logout"
+                       value="Log Out" />
+            </form>
+        </th>
+    </tr>
+</table>

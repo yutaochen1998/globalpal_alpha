@@ -43,27 +43,51 @@ app.engine('ejs', engine);
 app.set('views',__dirname + '/views');
 app.set('view engine', 'ejs');
 
+//fetch personal info and render page
+app.get('/personal_info', function(req, res) {
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		//add more needed info here
+		res.render('personal_info', {
+			title: 'Personal info',
+			content_type: result.default_profile_photo.contentType,
+			profile_photo: result.default_profile_photo.data
+		});
+	});
+});
+
+//handle logout request
+app.get('/logout', function(req, res) {
+	req.session.destroy();
+	console.log('Logout successful');
+	res.redirect('/');
+});
+
 //handle login request
 app.post('/login', function(req, res) {
 
 	let email = req.body.email_login;
 	let password = req.body.password_login;
 
-	db.collection('Accounts').find({email: email}).toArray(function (err, result) {
+	db.collection('Accounts').findOne({email: email}, function (err, result) {
 		if (err) throw err;
-		if (result.length === 0) {
-			console.log("Account doesn't exists!");
+		if (!result) {
+			console.log("Account doesn't exists");
 			res.render('login_failed', {title: 'Login failed', error_message: "Account doesn't exists!"});
 		} else {
 			password = crypto.createHmac('sha1', password).update(password).digest('hex');
-			if (result[0].password !== password) {
-				console.log("Password incorrect!");
+			if (result.password !== password) {
+				console.log("Password incorrect");
 				res.render('login_failed', {title: 'Login failed', error_message: "Password incorrect!"});
 			} else {
 				req.session.userID = email;
-				console.log("Login successful!");
+				console.log("Login successful");
 				console.log("userID: " + req.session.userID);
-				res.render('start_friendship', {title: 'GlobalPal', user_name: result[0].firstName});
+				res.render('start_friendship', {
+					title: 'GlobalPal',
+					user_name: result.firstName,
+					content_type: result.default_profile_photo.contentType,
+					profile_photo: result.default_profile_photo.data});
 			}
 		}
 	});
@@ -83,8 +107,8 @@ app.post('/signup', function(req, res) {
 	let password = req.body.password_signup;
 	let phone = req.body.phone_signup;
 
-	db.collection('Accounts').find({$or: [{email: email}, {phone: phone}]}).toArray(function (err, result) {
-		if (result.length === 0) {
+	db.collection('Accounts').findOne({$or: [{email: email}, {phone: phone}]}, function (err, result) {
+		if (!result) {
 
 			password = crypto.createHmac('sha1', password).update(password).digest('hex');
 
@@ -95,20 +119,23 @@ app.post('/signup', function(req, res) {
 				password: password,
 				phone: phone,
 				//bellow are reserved as placeholder
-				profile: {data: fs.readFileSync('images/default_profile.png'), contentType: 'image/png'},
+				default_profile_photo: {data: fs.readFileSync('images/default_profile_photo.png').toString('base64'),
+					contentType: 'image/png'},
+				default_showcase_photo: {data: fs.readFileSync('images/default_showcase_photo.png').toString('base64'),
+					contentType: 'image/png'},
 				gender: "secret",
 				age: "secret",
 				birthday: "secret",
 				country: "secret",
 				city: "secret",
 				job: "secret",
-				sexualOrientation: "secret",
-				personalDescription: "secret",
-				facebookLink: "secret",
+				sexual_orientation: "secret",
+				personal_description: "secret",
+				facebook_link: "secret"
 			};
 			db.collection('Accounts').insertOne(new_account, function(err) {
 				if (err) throw err;
-				console.log("Account registered Successfully!");
+				console.log("Account registration successful");
 			});
 			res.render('signup_successful', {title: 'Sign up successful!'});
 		} else {
@@ -126,7 +153,7 @@ app.get('/signup_page', function(req, res) {
 //show homepage
 const port = 3000;
 app.get('/', function(req, res) {
-	res.set({ 
+	res.set({
 		'Access-Control-Allow-Origin': '*'
 	});
 	res.render('welcome_page', {title: 'Welcome to GlobalPal!'});

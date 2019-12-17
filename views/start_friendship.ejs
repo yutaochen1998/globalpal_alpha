@@ -1,4 +1,95 @@
 <% layout('layout_general') -%>
 <% stylesheet('../stylesheets/style.css') -%>
 
-<h1>Welcome to GlobalPal, <%= user_name %></h1>
+<table style="width:1px">
+    <tr>
+        <th>
+            <img src="data:<%= content_type %>;base64,<%= profile_photo %>" class="profile_photo_top_left">
+        </th>
+        <th>
+            <form action="/logout" method="get">
+                <input type="submit" id="logout"
+                       value="Log Out" />
+            </form>
+        </th>
+    </tr>
+</table>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xl-2">
+        </div>
+
+        <div class="col-xl-8">
+            <h1>It's a plane, it's a bird, it's <%= user_name %>.</h1><br>
+        </div>
+
+        <div class="col-xl-2">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-1">
+        </div>
+
+        <div class="col-xl-10 main">
+            <p class="message">Let's start your journey by customizing your personal info,
+                or jump right into the social pool!</p>
+
+            <div class="row">
+                <div class="col-xl-8">
+                    <form action="/personal_info" method="get">
+                        <input type="submit" id="personal_info"
+                               value="Personal Info" />
+                    </form><br>
+                </div>
+
+                <div class="col-xl-4">
+                    <p>Upload your profile photo, fill in your info, make yourself special</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xl-8">
+                    <form action="/search_user" method="get">
+                        <input type="submit" id="search_user"
+                               value="Search User" />
+                    </form><br>
+                </div>
+
+                <div class="col-xl-4">
+                    <p>Search a user via E-Mail</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xl-8">
+                    <form action="/search_with_filter" method="get">
+                        <input type="submit" id="search_with_filter"
+                               value="Search with Filter" />
+                    </form><br>
+                </div>
+
+                <div class="col-xl-4">
+                    <p>Find people of your interest</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xl-8">
+                    <form action="/fetch_me_one" method="get">
+                        <input type="submit" id="fetch_me_one"
+                               value="Fetch Me One" />
+                    </form><br>
+                </div>
+
+                <div class="col-xl-4">
+                    <p>Don't wanna mess with filters? Try making friends with random people</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-1">
+        </div>
+    </div>
+</div>
