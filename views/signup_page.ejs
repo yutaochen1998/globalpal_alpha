@@ -6,44 +6,42 @@
 <br>
 <div class="container" >
 	<div class="row">
-		<div class="col-lg-3">
+		<div class="col-xl-3">
 		</div>
 
-		<div class="col-lg-6 main">
+		<div class="col-xl-6 main">
 			<form action="/signup" method="post">
 				<h1>Signup</h1>
 
-				<label for="firstname_signup">First Name</label>
-				<input class="box" type="text" id="firstname_signup"
-					   name="firstname_signup" placeholder="David" required /><br>
+				<label for="first_name_signup">First Name</label>
+				<input class="box" type="text" name="first_name_signup"
+					   placeholder="David" required /><br>
 
-				<label for="lastname_signup">Last Name</label>
-				<input class="box" type="text" id="lastname_signup"
-					   name="lastname_signup" placeholder="Smith" required /><br>
+				<label for="last_name_signup">Last Name</label>
+				<input class="box" type="text" name="last_name_signup"
+					   placeholder="Smith" required /><br>
 
 				<label for="email_signup">E-Mail</label>
-				<input class="box" type="email" id="email_signup"
-					   name="email_signup" placeholder="explame@123.com" required /><br>
+				<input class="box" type="email" name="email_signup"
+					   placeholder="explame@123.com" required /><br>
 
 				<label for="password_signup">Password</label>
-				<input class="box" type="password" id="password_signup"
-					   name="password_signup" placeholder="Enter your password" required /><br>
+				<input class="box" type="password" name="password_signup"
+					   placeholder="Enter your password" required /><br>
 
 				<label for="phone_signup">Phone</label>
-				<input class="box" type="text" id="phone_signup"
-					   name="phone_signup" placeholder="07421234567" required /><br><br>
+				<input class="box" type="text" name="phone_signup"
+					   placeholder="07421234567" required /><br><br>
 
-				<input type="submit" id="submit_signup"
-					   value="Submit" /><br>
+				<input type="submit" value="Submit" /><br>
 			</form>
 
-			<form action="/" method="get">
-				<input type="submit" id="signup_page_return2home"
-					   value="Return">
+			<form action="javascript:history.back()" method="get">
+				<input type="submit" value="Return">
 			</form>
 		</div>
 
-		<div class="col-lg-3">
+		<div class="col-xl-3">
 		</div>
 	</div>
 </div>

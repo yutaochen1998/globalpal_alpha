@@ -1,10 +1,11 @@
 <% layout('layout_general') -%>
 <% stylesheet('../stylesheets/style.css') -%>
 
+<!--top left profile photo and logout button-->
 <table style="width:1px">
     <tr>
         <th>
-            <img src="data:<%= content_type %>;base64,<%= profile_photo %>" class="profile_photo_top_left">
+            <img src="data:<%= profile_photo_content_type %>;base64,<%= profile_photo %>" class="profile_photo_top_left">
         </th>
         <th>
             <form action="/logout" method="get">
@@ -39,8 +40,7 @@
             <div class="row">
                 <div class="col-xl-8">
                     <form action="/personal_info" method="get">
-                        <input type="submit" id="personal_info"
-                               value="Personal Info" />
+                        <input type="submit" value="Personal Info" />
                     </form><br>
                 </div>
 
@@ -52,8 +52,7 @@
             <div class="row">
                 <div class="col-xl-8">
                     <form action="/search_user" method="get">
-                        <input type="submit" id="search_user"
-                               value="Search User" />
+                        <input type="submit" value="Search User" />
                     </form><br>
                 </div>
 
@@ -65,8 +64,7 @@
             <div class="row">
                 <div class="col-xl-8">
                     <form action="/search_with_filter" method="get">
-                        <input type="submit" id="search_with_filter"
-                               value="Search with Filter" />
+                        <input type="submit" value="Search with Filter" />
                     </form><br>
                 </div>
 
@@ -78,13 +76,24 @@
             <div class="row">
                 <div class="col-xl-8">
                     <form action="/fetch_me_one" method="get">
-                        <input type="submit" id="fetch_me_one"
-                               value="Fetch Me One" />
+                        <input type="submit" value="Fetch Me One" />
                     </form><br>
                 </div>
 
                 <div class="col-xl-4">
                     <p>Don't wanna mess with filters? Try making friends with random people</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xl-8">
+                    <form action="/account_info" method="get">
+                        <input type="submit" value="Account Info" />
+                    </form><br>
+                </div>
+
+                <div class="col-xl-4">
+                    <p>Manage your account</p>
                 </div>
             </div>
         </div>

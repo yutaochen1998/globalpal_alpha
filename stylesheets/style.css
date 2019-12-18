@@ -19,11 +19,29 @@ p.message {
     text-align: center;
 }
 
+p.info {
+    font-size: 30px;
+}
+
+p.warning {
+    color: #ff0000;
+}
+
 .profile_photo_top_left {
     max-width: 75px;
     max-height: 75px;
     margin: 10px 10px;
     border: 3px solid #73AD21;
+}
+
+.profile_photo {
+    max-width: 75px;
+    max-height: 75px;
+}
+
+.showcase_photo {
+    max-width: 500px;
+    max-height: 500px;
 }
 
 #welcome_title {
@@ -71,4 +89,8 @@ input[type=submit] {
 #logout {
     width: 140px;
     background-color: #73AD21;
+}
+
+input.delete_account {
+    background-color: #ff0000;
 }

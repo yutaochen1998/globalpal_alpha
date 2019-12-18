@@ -27,9 +27,8 @@ db.once('open', function() {
 const app = express();
 
 //configure express app
-app.use(express.static(__dirname));  
-app.use(bodyParser.json()); 
-app.use(express.static('public'));
+app.use(express.static(__dirname));
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({
   secret: 'coursework is hell',
@@ -43,6 +42,92 @@ app.engine('ejs', engine);
 app.set('views',__dirname + '/views');
 app.set('view engine', 'ejs');
 
+//handle delete account request
+app.get('/delete_account', function(req, res) {
+	db.collection('Accounts').deleteOne({email: req.session.userID}, function(err) {
+		if (err) throw err;
+	});
+	console.log('Account delete successful');
+	res.redirect('/');
+});
+
+//render account delete confirm page
+app.get('/delete_account_confirm', function (req, res) {
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		//add more needed info here
+		res.render('delete_account_confirm', {
+			title: 'Confirm before you go',
+			profile_photo_content_type: result.profile_photo.content_type,
+			profile_photo: result.profile_photo.data
+		});
+	});
+});
+
+//handle password changing request
+app.post('/change_password', function(req, res) {
+
+	let password = req.body.password_change;
+	password = crypto.createHmac('sha1', password).update(password).digest('hex');
+
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		//add more needed info here
+		if (password === result.password) {
+			res.render('change_password_result',
+				{title: 'Password change failed!',
+					message: 'Please use different password.',
+					button_action: 'javascript:history.back()',
+					button_value: 'Return',
+					profile_photo_content_type: result.profile_photo.content_type,
+					profile_photo: result.profile_photo.data
+				});
+			console.log("Same password, failed to commit");
+		} else {
+			db.collection("Accounts").updateOne({email: req.session.userID},
+				{$set: {password: password}}, function(err) {
+				if (err) throw err;
+			});
+			res.render('change_password_result',
+				{title: 'Password change successful!',
+					message: 'Please re-login to your account.',
+					button_action: '/logout',
+					button_value: 'Logout',
+					profile_photo_content_type: result.profile_photo.content_type,
+					profile_photo: result.profile_photo.data
+				});
+			console.log("Password change successful");
+		}
+	});
+});
+
+//render password changing page
+app.get('/change_password_page', function(req, res) {
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		//add more needed info here
+		res.render('change_password_page', {
+			title: 'Change password',
+			profile_photo_content_type: result.profile_photo.content_type,
+			profile_photo: result.profile_photo.data
+		});
+	});
+});
+
+//fetch account info and render page
+app.get('/account_info', function(req, res) {
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		//add more needed info here
+		res.render('account_info', {
+			title: 'Account info',
+			userID: req.session.userID,
+			profile_photo_content_type: result.profile_photo.content_type,
+			profile_photo: result.profile_photo.data
+		});
+	});
+});
+
 //fetch personal info and render page
 app.get('/personal_info', function(req, res) {
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
@@ -50,8 +135,22 @@ app.get('/personal_info', function(req, res) {
 		//add more needed info here
 		res.render('personal_info', {
 			title: 'Personal info',
-			content_type: result.default_profile_photo.contentType,
-			profile_photo: result.default_profile_photo.data
+			first_name: result.first_name,
+			last_name: result.last_name,
+			gender: result.gender,
+			age: result.age,
+			birthday: result.birthday,
+			country: result.country,
+			city: result.city,
+			job: result.job,
+			sexual_orientation: result.sexual_orientation,
+			phone: result.phone,
+			personal_description: result.personal_description,
+			facebook_link: result.facebook_link,
+			profile_photo_content_type: result.profile_photo.content_type,
+			profile_photo: result.profile_photo.data,
+			showcase_photo_content_type: result.showcase_photo.content_type,
+			showcase_photo: result.showcase_photo.data
 		});
 	});
 });
@@ -85,9 +184,9 @@ app.post('/login', function(req, res) {
 				console.log("userID: " + req.session.userID);
 				res.render('start_friendship', {
 					title: 'GlobalPal',
-					user_name: result.firstName,
-					content_type: result.default_profile_photo.contentType,
-					profile_photo: result.default_profile_photo.data});
+					user_name: result.first_name,
+					profile_photo_content_type: result.profile_photo.content_type,
+					profile_photo: result.profile_photo.data});
 			}
 		}
 	});
@@ -101,8 +200,8 @@ app.get('/login_page', function(req, res) {
 //handle signup request
 app.post('/signup', function(req, res) {
 
-	let firstName = req.body.firstname_signup;
-	let lastName = req.body.lastname_signup;
+	let first_name = req.body.first_name_signup;
+	let last_name = req.body.last_name_signup;
 	let email = req.body.email_signup;
 	let password = req.body.password_signup;
 	let phone = req.body.phone_signup;
@@ -113,16 +212,16 @@ app.post('/signup', function(req, res) {
 			password = crypto.createHmac('sha1', password).update(password).digest('hex');
 
 			let new_account = {
-				firstName: firstName,
-				lastName: lastName,
+				first_name: first_name,
+				last_name: last_name,
 				email: email,
 				password: password,
 				phone: phone,
 				//bellow are reserved as placeholder
-				default_profile_photo: {data: fs.readFileSync('images/default_profile_photo.png').toString('base64'),
-					contentType: 'image/png'},
-				default_showcase_photo: {data: fs.readFileSync('images/default_showcase_photo.png').toString('base64'),
-					contentType: 'image/png'},
+				profile_photo: {data: fs.readFileSync('images/default_profile_photo.png').toString('base64'),
+					content_type: 'image/png'},
+				showcase_photo: {data: fs.readFileSync('images/default_showcase_photo.png').toString('base64'),
+					content_type: 'image/png'},
 				gender: "secret",
 				age: "secret",
 				birthday: "secret",
@@ -130,8 +229,8 @@ app.post('/signup', function(req, res) {
 				city: "secret",
 				job: "secret",
 				sexual_orientation: "secret",
-				personal_description: "secret",
-				facebook_link: "secret"
+				personal_description: "-",
+				facebook_link: "-"
 			};
 			db.collection('Accounts').insertOne(new_account, function(err) {
 				if (err) throw err;
@@ -150,7 +249,7 @@ app.get('/signup_page', function(req, res) {
 	res.render('signup_page', {title: 'Sign up'});
 });
 
-//show homepage
+//start server and render homepage
 const port = 3000;
 app.get('/', function(req, res) {
 	res.set({

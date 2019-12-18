@@ -22,7 +22,7 @@
         </div>
 
         <div class="col-xl-8">
-            <h1>My Profile</h1><br>
+            <h1>My Account</h1><br>
         </div>
 
         <div class="col-xl-2">
@@ -33,39 +33,20 @@
         <div class="col-xl main">
             <div class="row">
                 <div class="col-xl-6">
-                    <p class="info">Name: <%= first_name %> <%= last_name %></p>
-                    <p class="info">Gender: <%= gender %></p>
-                    <p class="info">Age: <%= age %></p>
-                    <p class="info">Birthday: <%= birthday %></p>
-                    <p class="info">Country: <%= country %></p>
-                    <p class="info">City: <%= city %></p>
-                    <p class="info">Job: <%= job %></p>
-                    <p class="info">Sexual Orientation: <%= sexual_orientation %></p>
-                    <p class="info">Phone: <%= phone %></p>
-                    <p class="info">Personal Description: </p>
-                    <p><%= personal_description %></p>
-                    <p class="info">Facebook Link: </p>
-                    <p><%= facebook_link %></p>
+                    <p class="info">User ID: <%= userID %></p>
                 </div>
 
                 <div class="col-xl-6">
                     <p class="info">Profile photo:</p>
                     <img src="data:<%= profile_photo_content_type %>;base64,<%= profile_photo %>"
-                         class="profile_photo"><br><br>
-
-                    <p class="info">Showcase photo:</p>
-                    <img src="data:<%= showcase_photo_content_type %>;base64,<%= showcase_photo %>"
-                         class="showcase_photo">
+                         class="profile_photo">
                 </div>
-            </div>
+            </div><br><br>
 
             <div class="row">
-                <div class="col-xl-2">
-                </div>
-
                 <div class="col-xl-4">
-                    <form action="/edit_personal_info" method="get">
-                        <input type="submit" value="Edit">
+                    <form action="/change_password_page" method="get">
+                        <input type="submit" value="Change Password">
                     </form>
                 </div>
 
@@ -75,7 +56,10 @@
                     </form>
                 </div>
 
-                <div class="col-xl-2">
+                <div class="col-xl-4">
+                    <form action="/delete_account_confirm" method="get">
+                        <input class="delete_account" type="submit" value="Delete Account">
+                    </form>
                 </div>
             </div>
         </div>
