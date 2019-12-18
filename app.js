@@ -100,7 +100,7 @@ app.get('/personal_info_edit_page', function(req, res) {
 		if (err) throw err;
 		//add more needed info here
 		res.render('personal_info_edit_page', {
-			title: 'Personal info_edit_page',
+			title: 'Personal info edit page',
 			first_name: result.first_name,
 			last_name: result.last_name,
 			gender: result.gender,
