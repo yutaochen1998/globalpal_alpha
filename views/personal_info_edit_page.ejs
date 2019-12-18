@@ -1,0 +1,171 @@
+<% layout('layout_general') -%>
+<% stylesheet('../stylesheets/style.css') -%>
+
+<!--top left profile photo and logout button-->
+<table style="width:1px">
+    <tr>
+        <th>
+            <img src="data:<%= profile_photo_content_type %>;base64,<%= profile_photo %>" class="profile_photo_top_left" alt="Unknown error">
+        </th>
+        <th>
+            <form action="/logout" method="get">
+                <input type="submit" id="logout"
+                       value="Log Out" />
+            </form>
+        </th>
+    </tr>
+</table>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xl-2">
+        </div>
+
+        <div class="col-xl-8">
+            <h1>Edit Profile</h1><br>
+        </div>
+
+        <div class="col-xl-2">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl main">
+            <div class="row">
+                <div class="col-xl-6">
+                    <form action="/personal_info_edit" method="post" id="personal_info_edit">
+                        <label for="first_name_edit">First name</label>
+                        <input class="box" type="text" name="first_name_edit" id="first_name_edit"
+                               value="<%= first_name %>" required /><br>
+
+                        <label for="last_name_edit">Last name</label>
+                        <input class="box" type="text" name="last_name_edit" id="last_name_edit"
+                               value="<%= last_name %>" required /><br>
+
+                        <label>Gender</label><br>
+
+                        <input type="radio" name="gender_edit" id="gender_edit_male"
+                               value="male" <% if(gender==="male"){ %> checked="checked" <% } %> />
+                        <label for="gender_edit_male">Male &nbsp;</label>
+
+                        <input type="radio" name="gender_edit" id="gender_edit_female"
+                               value="female" <% if(gender==="female"){ %> checked="checked" <% } %> />
+                        <label for="gender_edit_female">Female &nbsp;</label>
+
+                        <input type="radio" name="gender_edit" id="gender_edit_other"
+                               value="other" <% if(gender==="other"){ %> checked="checked" <% } %> />
+                        <label for="gender_edit_other">Other &nbsp;</label>
+
+                        <input type="radio" name="gender_edit" id="gender_edit_secret"
+                               value="secret" <% if(gender==="secret"){ %> checked="checked" <% } %> />
+                        <label for="gender_edit_secret">Secret &nbsp;</label><br><br>
+
+                        <label for="birthday_edit">Birthday</label><br>
+                        <input type="date" name="birthday_edit" id="birthday_edit"
+                               max="<%= today %>" value="<%= birthday %>"><br><br>
+
+                        <label for="country_edit">Country</label><br>
+                        <select name="country_edit" id="country_edit">
+                            <option value="Australia" <% if(country==="Australia"){ %> selected="selected" <% } %>>Australia</option>
+                            <option value="Brazil" <% if(country==="Brazil"){ %> selected="selected" <% } %>>Brazil</option>
+                            <option value="China" <% if(country==="China"){ %> selected="selected" <% } %>>China</option>
+                            <option value="Denmark" <% if(country==="Denmark"){ %> selected="selected" <% } %>>Denmark</option>
+                            <option value="Egypt" <% if(country==="Egypt"){ %> selected="selected" <% } %>>Egypt</option>
+                            <option value="France" <% if(country==="France"){ %> selected="selected" <% } %>>France</option>
+                            <option value="Germany" <% if(country==="Germany"){ %> selected="selected" <% } %>>Germany</option>
+                            <option value="Hungary" <% if(country==="Hungary"){ %> selected="selected" <% } %>>Hungary</option>
+                            <option value="India" <% if(country==="India"){ %> selected="selected" <% } %>>India</option>
+                            <option value="Japan" <% if(country==="Japan"){ %> selected="selected" <% } %>>Japan</option>
+                            <option value="Korea" <% if(country==="Korea"){ %> selected="selected" <% } %>>Korea</option>
+                            <option value="Luxembourg" <% if(country==="Luxembourg"){ %> selected="selected" <% } %>>Luxembourg</option>
+                            <option value="Malaysia" <% if(country==="Malaysia"){ %> selected="selected" <% } %>>Malaysia</option>
+                            <option value="Norway" <% if(country==="Norway"){ %> selected="selected" <% } %>>Norway</option>
+                            <option value="Oman" <% if(country==="Oman"){ %> selected="selected" <% } %>>Oman</option>
+                            <option value="Portugal" <% if(country==="Portugal"){ %> selected="selected" <% } %>>Portugal</option>
+                            <option value="Qatar" <% if(country==="Qatar"){ %> selected="selected" <% } %>>Qatar</option>
+                            <option value="Russia" <% if(country==="Russia"){ %> selected="selected" <% } %>>Russia</option>
+                            <option value="Sweden" <% if(country==="Sweden"){ %> selected="selected" <% } %>>Sweden</option>
+                            <option value="Thailand" <% if(country==="Thailand"){ %> selected="selected" <% } %>>Thailand</option>
+                            <option value="Ukraine" <% if(country==="Ukraine"){ %> selected="selected" <% } %>>Ukraine</option>
+                            <option value="Vietnam" <% if(country==="Vietnam"){ %> selected="selected" <% } %>>Vietnam</option>
+                            <option value="Yemen" <% if(country==="Yemen"){ %> selected="selected" <% } %>>Yemen</option>
+                            <option value="Zimbabwe" <% if(country==="Zimbabwe"){ %> selected="selected" <% } %>>Zimbabwe</option>
+                            <option value="secret" <% if(country==="secret"){ %> selected="selected" <% } %>>secret</option>
+                        </select><br>
+
+                        <label for="city_edit">City</label>
+                        <input class="box" type="text" name="city_edit" id="city_edit"
+                               value="<%= city %>" required /><br>
+
+                        <label for="job_edit">Job</label>
+                        <input class="box" type="text" name="job_edit" id="job_edit"
+                               value="<%= job %>" required /><br>
+
+                        <label>Sexual Orientation</label><br>
+
+                        <input type="radio" name="sexual_orientation_edit" id="sexual_orientation_edit_heterosexual"
+                               value="heterosexual" <% if(sexual_orientation==="heterosexual"){ %> checked="checked" <% } %> />
+                        <label for="sexual_orientation_edit_heterosexual">heterosexual &nbsp;</label>
+
+                        <input type="radio" name="sexual_orientation_edit" id="sexual_orientation_edit_homosexual"
+                               value="homosexual" <% if(sexual_orientation==="homosexual"){ %> checked="checked" <% } %> />
+                        <label for="sexual_orientation_edit_homosexual">homosexual &nbsp;</label>
+
+                        <input type="radio" name="sexual_orientation_edit" id="sexual_orientation_edit_bisexual"
+                               value="bisexual" <% if(sexual_orientation==="bisexual"){ %> checked="checked" <% } %> />
+                        <label for="sexual_orientation_edit_bisexual">bisexual &nbsp;</label>
+
+                        <input type="radio" name="sexual_orientation_edit" id="sexual_orientation_edit_secret"
+                               value="secret" <% if(sexual_orientation==="secret"){ %> checked="checked" <% } %> />
+                        <label for="sexual_orientation_edit_secret">secret &nbsp;</label><br><br>
+
+                        <label for="phone_edit">Phone</label>
+                        <input class="box" type="text" name="phone_edit" id="phone_edit"
+                               value="<%= phone %>" required /><br>
+
+                        <label for="personal_description_edit">Personal Description: </label>
+                        <textarea rows="4" name="personal_description_edit"
+                                  id="personal_description_edit"><%= personal_description %></textarea>
+
+                        <label for="facebook_link_edit">Facebook Link: </label>
+                        <textarea rows="4" name="facebook_link_edit"
+                                  id="facebook_link_edit"><%= facebook_link %></textarea>
+                    </form>
+                </div>
+
+                <div class="col-xl-6">
+                    <form action="photo_edit" method="post" enctype="multipart/form-data">
+                        <p class="info">Profile photo:</p>
+                        <input type="file" name="profile_photo_edit" accept="image/*"><br><br>
+                        <img src="data:<%= profile_photo_content_type %>;base64,<%= profile_photo %>"
+                             class="profile_photo"  alt="Unknown error"><br>
+
+                        <p class="info">Showcase photo:</p>
+                        <input type="file" name="showcase_photo_edit" accept="image/*"><br><br>
+                        <img src="data:<%= showcase_photo_content_type %>;base64,<%= showcase_photo %>"
+                             class="showcase_photo" alt="Unknown error"><br><br>
+                        <input type="submit" value="Update Photos">
+                    </form>
+                </div>
+            </div><br>
+
+            <div class="row">
+                <div class="col-xl-2">
+                </div>
+
+                <div class="col-xl-4">
+                    <input type="submit" value="Commit" form="personal_info_edit">
+                </div>
+
+                <div class="col-xl-4">
+                    <form action="javascript:history.back()" method="get">
+                        <input type="submit" value="Return">
+                    </form>
+                </div>
+
+                <div class="col-xl-2">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

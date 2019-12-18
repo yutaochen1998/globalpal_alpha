@@ -8,6 +8,9 @@ const fs = require('fs');
 const session = require('express-session');
 const engine = require('ejs-locals');
 const crypto = require('crypto');
+const moment = require('moment');
+const fileUpload = require('express-fileupload');
+const tools = require('./javascripts/tools');
 
 //configure mongodb connection
 mongoose.set('useNewUrlParser', true);
@@ -36,11 +39,87 @@ app.use(session({
   saveUninitialized: false,
   cookie: {secure: false}
 }));
+app.use(fileUpload({
+	limits: {fileSize: 4 * 1024 * 1024}
+}));
 
 //set view engine as 'ejs-locals'
 app.engine('ejs', engine);
 app.set('views',__dirname + '/views');
 app.set('view engine', 'ejs');
+
+//handle edit photo request
+app.post('/photo_edit', function(req, res) {
+
+	if (req.files.profile_photo_edit) {
+		db.collection("Accounts").updateOne({email: req.session.userID},
+			{$set: {profile_photo: {data: Buffer.from(req.files.profile_photo_edit.data).toString('base64'),
+						content_type: req.files.profile_photo_edit.mimetype}
+				}}, function(err) {
+				if (err) throw err;
+			});
+	}
+	if (req.files.showcase_photo_edit) {
+		db.collection("Accounts").updateOne({email: req.session.userID},
+			{$set: {showcase_photo: {data: Buffer.from(req.files.showcase_photo_edit.data).toString('base64'),
+						content_type: req.files.showcase_photo_edit.mimetype}
+				}}, function(err) {
+				if (err) throw err;
+			});
+	}
+	console.log('Photos update successful');
+	res.redirect('/personal_info');
+});
+
+
+//handle edit personal info request
+app.post('/personal_info_edit', function(req, res) {
+
+	db.collection("Accounts").updateOne({email: req.session.userID},
+		{$set: {first_name: req.body.first_name_edit,
+				last_name: req.body.last_name_edit,
+				gender: req.body.gender_edit,
+				birthday: req.body.birthday_edit,
+				country: req.body.country_edit,
+				city: req.body.city_edit,
+				job: req.body.job_edit,
+				sexual_orientation: req.body.sexual_orientation_edit,
+				phone: req.body.phone_edit,
+				personal_description: req.body.personal_description_edit,
+				facebook_link: req.body.facebook_link_edit
+			}}, function(err) {
+			if (err) throw err;
+		});
+	console.log('Personal info edit successful');
+	res.redirect('/personal_info');
+});
+
+//render personal info edit page
+app.get('/personal_info_edit_page', function(req, res) {
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		//add more needed info here
+		res.render('personal_info_edit_page', {
+			title: 'Personal info_edit_page',
+			first_name: result.first_name,
+			last_name: result.last_name,
+			gender: result.gender,
+			birthday: result.birthday,
+			today: moment().format('YYYY-MM-DD'),
+			country: result.country,
+			city: result.city,
+			job: result.job,
+			sexual_orientation: result.sexual_orientation,
+			phone: result.phone,
+			personal_description: result.personal_description,
+			facebook_link: result.facebook_link,
+			profile_photo_content_type: result.profile_photo.content_type,
+			profile_photo: result.profile_photo.data,
+			showcase_photo_content_type: result.showcase_photo.content_type,
+			showcase_photo: result.showcase_photo.data
+		});
+	});
+});
 
 //handle delete account request
 app.get('/delete_account', function(req, res) {
@@ -138,7 +217,7 @@ app.get('/personal_info', function(req, res) {
 			first_name: result.first_name,
 			last_name: result.last_name,
 			gender: result.gender,
-			age: result.age,
+			age: tools.getAge(result.birthday),
 			birthday: result.birthday,
 			country: result.country,
 			city: result.city,
@@ -160,6 +239,18 @@ app.get('/logout', function(req, res) {
 	req.session.destroy();
 	console.log('Logout successful');
 	res.redirect('/');
+});
+
+//render main page
+app.get('/start_friendship', function(req, res) {
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		res.render('start_friendship', {
+			title: 'GlobalPal',
+			user_name: result.first_name,
+			profile_photo_content_type: result.profile_photo.content_type,
+			profile_photo: result.profile_photo.data});
+	});
 });
 
 //handle login request
@@ -223,8 +314,7 @@ app.post('/signup', function(req, res) {
 				showcase_photo: {data: fs.readFileSync('images/default_showcase_photo.png').toString('base64'),
 					content_type: 'image/png'},
 				gender: "secret",
-				age: "secret",
-				birthday: "secret",
+				birthday: moment().format('YYYY-MM-DD'),
 				country: "secret",
 				city: "secret",
 				job: "secret",
