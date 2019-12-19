@@ -48,29 +48,97 @@ app.engine('ejs', engine);
 app.set('views',__dirname + '/views');
 app.set('view engine', 'ejs');
 
+//handle whisper request
+app.post('/whisper', function (req, res) {
+	res.status(204).send();
+});
+
+//handle search by email request
+app.post('/search_by_email', function(req, res) {
+
+	let email = req.body.email_search;
+
+	if (email === req.session.userID) {
+		res.redirect('/personal_info');
+	} else {
+		db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+			if (err) throw err;
+			db.collection('Accounts').findOne({email: email}, function (err, result_search) {
+				if (err) throw err;
+				if (!result_search) {
+					res.render('search_by_email_failed', {
+						title: "User doesn't exist",
+						profile_photo_content_type: result.profile_photo.content_type,
+						profile_photo: result.profile_photo.data
+					});
+				} else {
+					res.render('search_by_email_result', {
+						title: "Search result",
+						email: email,
+						first_name: result_search.first_name,
+						last_name: result_search.last_name,
+						gender: result_search.gender,
+						age: tools.getAge(result_search.birthday),
+						country: result_search.country,
+						city: result_search.city,
+						job: result_search.job,
+						sexual_orientation: result_search.sexual_orientation,
+						personal_description: result_search.personal_description,
+						facebook_link: result_search.facebook_link,
+
+						profile_photo_content_type_top_left: result.profile_photo.content_type,
+						profile_photo_top_left: result.profile_photo.data,
+
+						profile_photo_content_type: result_search.profile_photo.content_type,
+						profile_photo: result_search.profile_photo.data,
+
+						showcase_photo_content_type: result_search.showcase_photo.content_type,
+						showcase_photo: result_search.showcase_photo.data
+					});
+				}
+			});
+		});
+	}
+});
+
+//render search user by email page
+app.get('/search_by_email_page', function(req, res) {
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		//add more needed info here
+		res.render('search_by_email_page', {
+			title: 'Search by email',
+
+			profile_photo_content_type_top_left: result.profile_photo.content_type,
+			profile_photo_top_left: result.profile_photo.data
+		});
+	});
+});
+
 //handle edit photo request
 app.post('/photo_edit', function(req, res) {
 
-	if (req.files.profile_photo_edit) {
-		db.collection("Accounts").updateOne({email: req.session.userID},
-			{$set: {profile_photo: {data: Buffer.from(req.files.profile_photo_edit.data).toString('base64'),
-						content_type: req.files.profile_photo_edit.mimetype}
-				}}, function(err) {
-				if (err) throw err;
-			});
+	if (req.files) {
+		if (req.files.profile_photo_edit) {
+			db.collection("Accounts").updateOne({email: req.session.userID},
+				{$set: {profile_photo: {data: Buffer.from(req.files.profile_photo_edit.data).toString('base64'),
+							content_type: req.files.profile_photo_edit.mimetype}
+					}}, function(err) {
+					if (err) throw err;
+				});
+		}
+		if (req.files.showcase_photo_edit) {
+			db.collection("Accounts").updateOne({email: req.session.userID},
+				{$set: {showcase_photo: {data: Buffer.from(req.files.showcase_photo_edit.data).toString('base64'),
+							content_type: req.files.showcase_photo_edit.mimetype}
+					}}, function(err) {
+					if (err) throw err;
+				});
+		}
+		console.log('Photos update successful');
 	}
-	if (req.files.showcase_photo_edit) {
-		db.collection("Accounts").updateOne({email: req.session.userID},
-			{$set: {showcase_photo: {data: Buffer.from(req.files.showcase_photo_edit.data).toString('base64'),
-						content_type: req.files.showcase_photo_edit.mimetype}
-				}}, function(err) {
-				if (err) throw err;
-			});
-	}
-	console.log('Photos update successful');
 	res.redirect('/personal_info');
 });
-
 
 //handle edit personal info request
 app.post('/personal_info_edit', function(req, res) {
@@ -83,8 +151,8 @@ app.post('/personal_info_edit', function(req, res) {
 				country: req.body.country_edit,
 				city: req.body.city_edit,
 				job: req.body.job_edit,
-				sexual_orientation: req.body.sexual_orientation_edit,
 				phone: req.body.phone_edit,
+				sexual_orientation: req.body.sexual_orientation_edit,
 				personal_description: req.body.personal_description_edit,
 				facebook_link: req.body.facebook_link_edit
 			}}, function(err) {
@@ -109,12 +177,17 @@ app.get('/personal_info_edit_page', function(req, res) {
 			country: result.country,
 			city: result.city,
 			job: result.job,
-			sexual_orientation: result.sexual_orientation,
 			phone: result.phone,
+			sexual_orientation: result.sexual_orientation,
 			personal_description: result.personal_description,
 			facebook_link: result.facebook_link,
+
+			profile_photo_content_type_top_left: result.profile_photo.content_type,
+			profile_photo_top_left: result.profile_photo.data,
+
 			profile_photo_content_type: result.profile_photo.content_type,
 			profile_photo: result.profile_photo.data,
+
 			showcase_photo_content_type: result.showcase_photo.content_type,
 			showcase_photo: result.showcase_photo.data
 		});
@@ -137,8 +210,9 @@ app.get('/delete_account_confirm', function (req, res) {
 		//add more needed info here
 		res.render('delete_account_confirm', {
 			title: 'Confirm before you go',
-			profile_photo_content_type: result.profile_photo.content_type,
-			profile_photo: result.profile_photo.data
+
+			profile_photo_content_type_top_left: result.profile_photo.content_type,
+			profile_photo_top_left: result.profile_photo.data
 		});
 	});
 });
@@ -158,8 +232,9 @@ app.post('/change_password', function(req, res) {
 					message: 'Please use different password.',
 					button_action: 'javascript:history.back()',
 					button_value: 'Return',
-					profile_photo_content_type: result.profile_photo.content_type,
-					profile_photo: result.profile_photo.data
+
+					profile_photo_content_type_top_left: result.profile_photo.content_type,
+					profile_photo_top_left: result.profile_photo.data
 				});
 			console.log("Same password, failed to commit");
 		} else {
@@ -172,8 +247,9 @@ app.post('/change_password', function(req, res) {
 					message: 'Please re-login to your account.',
 					button_action: '/logout',
 					button_value: 'Logout',
-					profile_photo_content_type: result.profile_photo.content_type,
-					profile_photo: result.profile_photo.data
+
+					profile_photo_content_type_top_left: result.profile_photo.content_type,
+					profile_photo_top_left: result.profile_photo.data
 				});
 			console.log("Password change successful");
 		}
@@ -187,8 +263,9 @@ app.get('/change_password_page', function(req, res) {
 		//add more needed info here
 		res.render('change_password_page', {
 			title: 'Change password',
-			profile_photo_content_type: result.profile_photo.content_type,
-			profile_photo: result.profile_photo.data
+
+			profile_photo_content_type_top_left: result.profile_photo.content_type,
+			profile_photo_top_left: result.profile_photo.data
 		});
 	});
 });
@@ -201,8 +278,12 @@ app.get('/account_info', function(req, res) {
 		res.render('account_info', {
 			title: 'Account info',
 			userID: req.session.userID,
+
+			profile_photo_content_type_top_left: result.profile_photo.content_type,
+			profile_photo_top_left: result.profile_photo.data,
+
 			profile_photo_content_type: result.profile_photo.content_type,
-			profile_photo: result.profile_photo.data
+			profile_photo: result.profile_photo.data,
 		});
 	});
 });
@@ -226,8 +307,13 @@ app.get('/personal_info', function(req, res) {
 			phone: result.phone,
 			personal_description: result.personal_description,
 			facebook_link: result.facebook_link,
+
+			profile_photo_content_type_top_left: result.profile_photo.content_type,
+			profile_photo_top_left: result.profile_photo.data,
+
 			profile_photo_content_type: result.profile_photo.content_type,
 			profile_photo: result.profile_photo.data,
+
 			showcase_photo_content_type: result.showcase_photo.content_type,
 			showcase_photo: result.showcase_photo.data
 		});
@@ -248,8 +334,8 @@ app.get('/start_friendship', function(req, res) {
 		res.render('start_friendship', {
 			title: 'GlobalPal',
 			user_name: result.first_name,
-			profile_photo_content_type: result.profile_photo.content_type,
-			profile_photo: result.profile_photo.data});
+			profile_photo_content_type_top_left: result.profile_photo.content_type,
+			profile_photo_top_left: result.profile_photo.data});
 	});
 });
 
@@ -271,13 +357,13 @@ app.post('/login', function(req, res) {
 				res.render('login_failed', {title: 'Login failed', error_message: "Password incorrect!"});
 			} else {
 				req.session.userID = email;
-				console.log("Login successful");
-				console.log("userID: " + req.session.userID);
+				console.log("Login successful, userID: " + req.session.userID);
 				res.render('start_friendship', {
 					title: 'GlobalPal',
 					user_name: result.first_name,
-					profile_photo_content_type: result.profile_photo.content_type,
-					profile_photo: result.profile_photo.data});
+
+					profile_photo_content_type_top_left: result.profile_photo.content_type,
+					profile_photo_top_left: result.profile_photo.data});
 			}
 		}
 	});
@@ -297,7 +383,7 @@ app.post('/signup', function(req, res) {
 	let password = req.body.password_signup;
 	let phone = req.body.phone_signup;
 
-	db.collection('Accounts').findOne({$or: [{email: email}, {phone: phone}]}, function (err, result) {
+	db.collection('Accounts').findOne({email: email}, function (err, result) {
 		if (!result) {
 
 			password = crypto.createHmac('sha1', password).update(password).digest('hex');

@@ -1,20 +1,5 @@
-<% layout('layout_general') -%>
+<% layout('layout_main') -%>
 <% stylesheet('../stylesheets/style.css') -%>
-
-<!--top left profile photo and logout button-->
-<table style="width:1px">
-    <tr>
-        <th>
-            <img src="data:<%= profile_photo_content_type %>;base64,<%= profile_photo %>" class="profile_photo_top_left" alt="Unknown error">
-        </th>
-        <th>
-            <form action="/logout" method="get">
-                <input type="submit" id="logout"
-                       value="Log Out" />
-            </form>
-        </th>
-    </tr>
-</table>
 
 <div class="container" >
     <div class="row">
@@ -26,7 +11,7 @@
                 <h1>Delete account confirm</h1>
                 <p class="warning">*Warning* The process is permanent and CANNOT be recovered!
                     Are you sure you want to delete your account and all data?</p>
-                <input type="submit" value="Return"><br>
+                <input type="submit" value="Cancel"><br>
             </form>
 
             <form action="/delete_account" method="get">

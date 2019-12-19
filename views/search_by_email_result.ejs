@@ -7,7 +7,7 @@
         </div>
 
         <div class="col-xl-8">
-            <h1>My Profile</h1><br>
+            <h1>User: <%= email %></h1><br>
         </div>
 
         <div class="col-xl-2">
@@ -21,12 +21,10 @@
                     <p class="info">Name: <%= first_name %> <%= last_name %></p>
                     <p class="info">Gender: <%= gender %></p>
                     <p class="info">Age: <%= age %></p>
-                    <p class="info">Birthday: <%= birthday %></p>
                     <p class="info">Country: <%= country %></p>
                     <p class="info">City: <%= city %></p>
                     <p class="info">Job: <%= job %></p>
                     <p class="info">Sexual Orientation: <%= sexual_orientation %></p>
-                    <p class="info">Phone: <%= phone %></p>
                     <p class="info">Personal Description: </p>
                     <p><%= personal_description %></p>
                     <p class="info">Facebook Link: </p>
@@ -40,18 +38,32 @@
 
                     <p class="info">Showcase photo:</p>
                     <img src="data:<%= showcase_photo_content_type %>;base64,<%= showcase_photo %>"
-                         class="showcase_photo" alt="Unknown error">
+                         class="showcase_photo" alt="Unknown error"><br><br>
+
+                    <form action="/whisper" method="post">
+                        <div class="row">
+                            <p class="info">Send a message or hit a like:</p>
+                            <div class="col-xl-8">
+                                <textarea rows="2" name="whisper"
+                                          placeholder="Hi! Would you like a cup of tea?" required ></textarea>
+                            </div>
+
+                            <div class="col-xl-2">
+                                <input class="interact" type="submit" value="💌">
+                            </div>
+
+                            <div class="col-xl-2">
+                                <form action="/like" method="get">
+                                    <input class="interact" type="submit" value="💘">
+                                </form>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </div>
+            </div><br>
 
             <div class="row">
-                <div class="col-xl-2">
-                </div>
-
                 <div class="col-xl-4">
-                    <form action="/personal_info_edit_page" method="get">
-                        <input type="submit" value="Edit">
-                    </form>
                 </div>
 
                 <div class="col-xl-4">
@@ -60,7 +72,7 @@
                     </form>
                 </div>
 
-                <div class="col-xl-2">
+                <div class="col-xl-4">
                 </div>
             </div>
         </div>
