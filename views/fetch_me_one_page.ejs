@@ -1,0 +1,60 @@
+<% layout('layout_main') -%>
+<% stylesheet('../stylesheets/style.css') -%>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xl-2">
+        </div>
+
+        <div class="col-xl-8">
+            <h1>I want to make friends with...</h1><br>
+        </div>
+
+        <div class="col-xl-2">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl main">
+            <form action="/fetch_me_one" method="post" id="gender_select">
+                <div class="row">
+                    <div class="col-xl-4">
+                        <input class="gender_select" type="radio" name="gender_select"
+                               id="gender_select_male" value="male" />
+                        <label class="gender_label" id="gender_label_male" for="gender_select_male">Male</label>
+                    </div>
+
+                    <div class="col-xl-4">
+                        <input class="gender_select" type="radio" name="gender_select"
+                               id="gender_select_female" value="female" />
+                        <label class="gender_label" id="gender_label_female" for="gender_select_female">Female</label>
+                    </div>
+
+                    <div class="col-xl-4">
+                        <input class="gender_select" type="radio" name="gender_select"
+                               id="gender_select_all" value="all" />
+                        <label class="gender_label" id="gender_label_all" for="gender_select_all">All</label>
+                    </div>
+                </div><br>
+            </form>
+
+            <div class="row">
+                <div class="col-xl-2">
+                </div>
+
+                <div class="col-xl-4">
+                    <input type="submit" value="Start" form="gender_select">
+                </div>
+
+                <div class="col-xl-4">
+                    <form action="/start_friendship" method="get">
+                        <input type="submit" value="Return">
+                    </form>
+                </div>
+
+                <div class="col-xl-2">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

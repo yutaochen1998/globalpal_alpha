@@ -1,5 +1,4 @@
-function getAge(birthday_raw)
-{
+function getAge(birthday_raw) {
     const moment = require('moment');
     let today = moment().format('YYYY-MM-DD').split("-");
     let birthday = birthday_raw.split("-");
@@ -15,4 +14,12 @@ function getAge(birthday_raw)
     return count;
 }
 
-module.exports = {getAge};
+function trimMessage(message_box, message_object) {
+    message_box.push(message_object);
+    //no more than 20 messages
+    if (message_box.length > 20) {
+        message_box.shift();
+    }
+}
+
+module.exports = {getAge, trimMessage};

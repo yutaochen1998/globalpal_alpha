@@ -1,5 +1,6 @@
 <% layout('layout_main') -%>
 <% stylesheet('../stylesheets/style.css') -%>
+<% script('../javascripts/wss_test.js') -%>
 
 <div class="container">
     <div class="row">
@@ -40,25 +41,25 @@
                     <img src="data:<%= showcase_photo_content_type %>;base64,<%= showcase_photo %>"
                          class="showcase_photo" alt="Unknown error"><br><br>
 
-                    <form action="/whisper" method="post">
-                        <div class="row">
-                            <p class="info">Send a message or hit a like:</p>
-                            <div class="col-xl-8">
+                    <p class="info">Send a message, hit a like, or start a chat!:</p>
+                    <div class="row">
+                        <div class="col-xl-8">
+                            <form action="/whisper" method="post" id="whisper">
                                 <textarea rows="2" name="whisper"
                                           placeholder="Hi! Would you like a cup of tea?" required ></textarea>
-                            </div>
-
-                            <div class="col-xl-2">
-                                <input class="interact" type="submit" value="💌">
-                            </div>
-
-                            <div class="col-xl-2">
-                                <form action="/like" method="get">
-                                    <input class="interact" type="submit" value="💘">
-                                </form>
-                            </div>
+                            </form>
                         </div>
-                    </form>
+
+                        <div class="col-xl-2">
+                            <input class="interact" type="submit" value="💌" form="whisper">
+                        </div>
+
+                        <div class="col-xl-2">
+                            <form action="/like" method="get" id="like">
+                                <input class="interact" type="submit" value="<%= like_icon %>" form="like">
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div><br>
 
@@ -67,7 +68,7 @@
                 </div>
 
                 <div class="col-xl-4">
-                    <form action="/start_friendship" method="get">
+                    <form action="/search_by_email_page" method="get">
                         <input type="submit" value="Return">
                     </form>
                 </div>

@@ -10,6 +10,8 @@ const engine = require('ejs-locals');
 const crypto = require('crypto');
 const moment = require('moment');
 const fileUpload = require('express-fileupload');
+const WebSocketServer = require("websocket").server;
+const http = require("http");
 const tools = require('./javascripts/tools');
 
 //configure mongodb connection
@@ -24,6 +26,29 @@ const db = mongoose.connection;
 db.on('error', console.log.bind(console, "connection error")); 
 db.once('open', function() {
     console.log("Connection succeeded.");
+});
+
+//set up websocket server side
+const port_wss = 9000;
+const server = http.createServer(function (request, response) {
+	console.log(new Date() + " Received request");
+});
+server.listen(port_wss, function() {
+	console.log(new Date() + " listening on port " + port_wss);
+});
+const wss = new WebSocketServer({
+	httpServer: server
+});
+
+wss.on("request", function(request) {
+	const connection = request.accept(null, request.origin);
+	connection.on("close", function(reasonCode, description) {
+		//console.log("Connection closed");
+	});
+	connection.on("message", function(message) {
+		//console.log(message.utf8Data);
+		connection.sendUTF(message.utf8Data);
+	});
 });
 
 //express app instance
@@ -48,33 +73,191 @@ app.engine('ejs', engine);
 app.set('views',__dirname + '/views');
 app.set('view engine', 'ejs');
 
+//render fetch me one page
+app.get('/fetch_me_one_page', function (req, res) {
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		//add more needed info here
+		res.render('fetch_me_one_page', {
+			title: 'Choose your interest',
+
+			profile_photo_content_type_top_left: result.profile_photo.content_type,
+			profile_photo_top_left: result.profile_photo.data
+		});
+	});
+});
+
+//handle clear message request
+app.get('/clear_message', function (req, res) {
+	db.collection('Accounts').updateOne({email: req.session.userID},
+		{$set: {message_box: []}}, function (err) {
+		if (err) throw err;
+	});
+	console.log('Message box cleared');
+	res.redirect('back');
+});
+
+//render my message page
+app.get('/my_message', function (req, res) {
+
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+
+		let message_box = result.message_box;
+		let message_list = '';
+
+		message_box.forEach(function (value, index) {
+			message_list += '<p>🔻' +
+				message_box[index].time_stamp +
+				' > ' +
+				message_box[index].userID +
+				'🔻<br>' +
+				message_box[index].message +
+				'</p><br>';
+		});
+		res.render('my_message', {
+			title: 'My message',
+			message_list: message_list,
+
+			profile_photo_content_type_top_left: result.profile_photo.content_type,
+			profile_photo_top_left: result.profile_photo.data
+		});
+	});
+});
+
+//handle like request
+app.get('/like', function (req, res) {
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		db.collection('Accounts').findOne({email: req.session.userID_search}, function (err, result_search) {
+			if (err) throw err;
+
+			let email = req.session.userID;
+			let like_box = result.like_box;
+			let email_search = req.session.userID_search;
+			let like_box_search = result_search.like_box;
+			let title;
+			let message;
+
+			if (!like_box[email_search]) {
+				//update my like box to like
+				like_box[email_search] = true;
+				title = 'Like❤️ sent!';
+				message = 'If he/she likes you, you will be matched.';
+				if (like_box_search[email]) {
+					//send system message (birthday & phone) to both users
+					let message_box = result.message_box;
+					tools.trimMessage(message_box,
+						{time_stamp: moment().format('YYYY-MM-DD'),
+							userID: 'System Message',
+							message: 'You matched with ' +
+								result_search.first_name + ' ' +
+								result_search.last_name + '!<br>' +
+								'User ID: ' + email_search + '<br>' +
+								'Birthday: ' + result_search.birthday + '<br>' +
+								'Phone: ' + result_search.phone});
+					db.collection("Accounts").updateOne({email: req.session.userID},
+						{$set: {message_box: message_box}}, function(err) {
+							if (err) throw err;
+						});
+					message_box = result_search.message_box;
+					tools.trimMessage(message_box,
+						{time_stamp: moment().format('YYYY-MM-DD'),
+							userID: 'System Message',
+							message: 'You matched with ' +
+								result.first_name + ' ' +
+								result.last_name + '!<br>' +
+								'User ID: ' + email + '<br>' +
+								'Birthday: ' + result.birthday + '<br>' +
+								'Phone: ' + result.phone});
+					db.collection("Accounts").updateOne({email: req.session.userID_search},
+						{$set: {message_box: message_box}}, function(err) {
+							if (err) throw err;
+						});
+					title = '💕Matched!';
+					message = 'Check your message box for more info.';
+				}
+			} else {
+				//update my like box to cancel like
+				delete like_box[email_search];
+				title = 'Like❤️ cancelled!';
+				message = 'You cancelled the like.';
+			}
+			db.collection("Accounts").updateOne({email: email},
+				{$set: {like_box: like_box}}, function(err) {
+					if (err) throw err;
+				});
+			console.log("Like box updated");
+			res.render('whisper_like_interact', {
+				title: title,
+				message: message,
+
+				profile_photo_content_type_top_left: result.profile_photo.content_type,
+				profile_photo_top_left: result.profile_photo.data
+			});
+		});
+	});
+});
+
 //handle whisper request
 app.post('/whisper', function (req, res) {
-	res.status(204).send();
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		db.collection('Accounts').findOne({email: req.session.userID_search}, function (err, result_search) {
+			if (err) throw err;
+			let message_box = result_search.message_box;
+				tools.trimMessage(message_box,
+				{time_stamp: moment().format('YYYY-MM-DD'),
+					userID: req.session.userID, message: req.body.whisper});
+			db.collection("Accounts").updateOne({email: req.session.userID_search},
+				{$set: {message_box: message_box}}, function(err) {
+					if (err) throw err;
+				});
+			console.log('Message box update successful');
+		});
+		res.render('whisper_like_interact', {
+			title: 'Whisper sent to: ' + req.session.userID_search,
+			message: 'He/She will receive your whisper in the message box.',
+			profile_photo_content_type_top_left: result.profile_photo.content_type,
+			profile_photo_top_left: result.profile_photo.data
+		});
+	});
 });
 
 //handle search by email request
 app.post('/search_by_email', function(req, res) {
 
-	let email = req.body.email_search;
+	let email = req.session.userID;
+	let email_search = req.body.email_search;
 
-	if (email === req.session.userID) {
+	if (email_search === email) {
 		res.redirect('/personal_info');
 	} else {
-		db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		db.collection('Accounts').findOne({email: email}, function (err, result) {
 			if (err) throw err;
-			db.collection('Accounts').findOne({email: email}, function (err, result_search) {
+			db.collection('Accounts').findOne({email: email_search}, function (err, result_search) {
 				if (err) throw err;
 				if (!result_search) {
 					res.render('search_by_email_failed', {
 						title: "User doesn't exist",
-						profile_photo_content_type: result.profile_photo.content_type,
-						profile_photo: result.profile_photo.data
+						profile_photo_content_type_top_left: result.profile_photo.content_type,
+						profile_photo_top_left: result.profile_photo.data
 					});
 				} else {
+					//set default like icon
+					let like_icon = '❤️';
+					//if I liked this user
+					if (result.like_box[email_search]) {
+						like_icon = '💘';
+						//if both users liked each other
+						if (result_search.like_box[email]) {
+							like_icon = '💕';
+						}
+					}
+					req.session.userID_search = email_search;
 					res.render('search_by_email_result', {
 						title: "Search result",
-						email: email,
+						email: email_search,
 						first_name: result_search.first_name,
 						last_name: result_search.last_name,
 						gender: result_search.gender,
@@ -85,6 +268,7 @@ app.post('/search_by_email', function(req, res) {
 						sexual_orientation: result_search.sexual_orientation,
 						personal_description: result_search.personal_description,
 						facebook_link: result_search.facebook_link,
+						like_icon: like_icon,
 
 						profile_photo_content_type_top_left: result.profile_photo.content_type,
 						profile_photo_top_left: result.profile_photo.data,
@@ -377,11 +561,8 @@ app.get('/login_page', function(req, res) {
 //handle signup request
 app.post('/signup', function(req, res) {
 
-	let first_name = req.body.first_name_signup;
-	let last_name = req.body.last_name_signup;
 	let email = req.body.email_signup;
 	let password = req.body.password_signup;
-	let phone = req.body.phone_signup;
 
 	db.collection('Accounts').findOne({email: email}, function (err, result) {
 		if (!result) {
@@ -389,11 +570,11 @@ app.post('/signup', function(req, res) {
 			password = crypto.createHmac('sha1', password).update(password).digest('hex');
 
 			let new_account = {
-				first_name: first_name,
-				last_name: last_name,
+				first_name: req.body.first_name_signup,
+				last_name: req.body.last_name_signup,
 				email: email,
 				password: password,
-				phone: phone,
+				phone: req.body.phone_signup,
 				//bellow are reserved as placeholder
 				profile_photo: {data: fs.readFileSync('images/default_profile_photo.png').toString('base64'),
 					content_type: 'image/png'},
@@ -406,7 +587,9 @@ app.post('/signup', function(req, res) {
 				job: "secret",
 				sexual_orientation: "secret",
 				personal_description: "-",
-				facebook_link: "-"
+				facebook_link: "-",
+				message_box: [],
+				like_box: {}
 			};
 			db.collection('Accounts').insertOne(new_account, function(err) {
 				if (err) throw err;
@@ -426,12 +609,12 @@ app.get('/signup_page', function(req, res) {
 });
 
 //start server and render homepage
-const port = 3000;
+const port_express = 3000;
 app.get('/', function(req, res) {
 	res.set({
 		'Access-Control-Allow-Origin': '*'
 	});
 	res.render('welcome_page', {title: 'Welcome to GlobalPal!'});
-}).listen(port, function() {
-	console.log("Server listening at port " + port);
+}).listen(port_express, function() {
+	console.log("Server listening at port " + port_express);
 });

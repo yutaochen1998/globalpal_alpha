@@ -3,16 +3,14 @@ const test = require('mocha').test;
 const assert = require('assert');
 const tools = require('../javascripts/tools');
 
-function increment (number) {
-    return number + 1;
-}
-
 suite("demo test", function() {
-    test("increment() increases the value by 1", function () {
-        let a = 1;
-        let b = 2;
-        a = increment(a);
-        assert.equal(a, b, "increment() is not working properly!");
+    test("object boolean value", function () {
+        let a = {};
+        let b = "original";
+        if (a.b) {
+            b = "changed";
+        }
+        assert.equal(b, "original", "blah");
     })
 });
 
