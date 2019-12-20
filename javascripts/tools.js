@@ -22,4 +22,12 @@ function trimMessage(message_box, message_object) {
     }
 }
 
-module.exports = {getAge, trimMessage};
+function selectPipeline(gender, userID) {
+    if (gender === "all") {
+        return {email: {$ne: userID}};
+    } else {
+        return {gender: gender, email: {$ne: userID}};
+    }
+}
+
+module.exports = {getAge, trimMessage, selectPipeline};

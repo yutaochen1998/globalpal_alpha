@@ -19,7 +19,7 @@ mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
-mongoose.connect('mongodb+srv://yc9841:chen2yu3tao1@yc001-0ofxw.azure.mongodb.net/test?retryWrites=true&w=majority');
+mongoose.connect('mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=false');
 
 //set up mongodb connection
 const db = mongoose.connection;
@@ -72,6 +72,74 @@ app.use(fileUpload({
 app.engine('ejs', engine);
 app.set('views',__dirname + '/views');
 app.set('view engine', 'ejs');
+
+//render chat lobby page
+app.get('/chat_lobby', function (req, res) {
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		//add more needed info here
+		res.render('chat_lobby', {
+			title: 'Chat lobby',
+
+			profile_photo_content_type_top_left: result.profile_photo.content_type,
+			profile_photo_top_left: result.profile_photo.data
+		});
+	});
+});
+
+//start fetch me one loop
+app.get('/fetch_me_one_loop', function (req, res) {
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		//add more needed info here
+		db.collection('Accounts').aggregate([
+			{$match: tools.selectPipeline(req.session.fetch_gender, req.session.userID)},
+			{$sample: {size: 1}}
+		]).next().then(function (result_random) {
+			//set default like icon
+			let like_icon = '❤️';
+			//if I liked this user
+			if (result.like_box[result_random.email]) {
+				like_icon = '💘';
+				//if both users liked each other
+				if (result_random.like_box[req.session.userID]) {
+					like_icon = '💕';
+				}
+			}
+			req.session.userID_search = result_random.email;
+			res.render('fetch_me_one', {
+				title: "Let's make some friends",
+				email: result_random.email,
+				first_name: result_random.first_name,
+				last_name: result_random.last_name,
+				gender: result_random.job,
+				age: tools.getAge(result_random.birthday),
+				country: result_random.country,
+				city: result_random.city,
+				job: result_random.job,
+				sexual_orientation: result_random.sexual_orientation,
+				personal_description: result_random.personal_description,
+				facebook_link: result_random.facebook_link,
+				like_icon: like_icon,
+
+				profile_photo_content_type_top_left: result.profile_photo.content_type,
+				profile_photo_top_left: result.profile_photo.data,
+
+				profile_photo_content_type: result_random.profile_photo.content_type,
+				profile_photo: result_random.profile_photo.data,
+
+				showcase_photo_content_type: result_random.showcase_photo.content_type,
+				showcase_photo: result_random.showcase_photo.data
+			});
+		});
+	});
+});
+
+//handle fetch me one request
+app.post('/fetch_me_one', function (req, res) {
+	req.session.fetch_gender = req.body.gender_select;
+	res.redirect('/fetch_me_one_loop');
+});
 
 //render fetch me one page
 app.get('/fetch_me_one_page', function (req, res) {
