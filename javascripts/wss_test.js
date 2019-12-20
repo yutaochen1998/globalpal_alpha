@@ -1,11 +1,25 @@
 $(document).ready(function() {
-    const port_ws = 9000;
-    const ws = new WebSocket('ws://localhost:' + port_ws);
-    ws.onopen = function (event) {
-        ws.send("Hello world from client");
-        console.log(event.data);
+    const port = 3000;
+    const connection = new WebSocket('ws://localhost:' + port + '/websocket_service');
+
+    connection.onopen = () => {
+        console.log('Websocket client connected');
+        connection.send("Hello world from client!");
     };
-    ws.onmessage = function (event) {
-        console.log(event.data);
+
+    connection.onclose = () => {
+        console.error('Websocket client disconnected');
     };
+
+    connection.onerror = (error) => {
+        console.error('Websocket client connection error', error);
+    };
+
+    connection.onmessage = (event) => {
+        console.log('Message received: ', event.data);
+    };
+
+    document.querySelector("#test").addEventListener('click', function() {
+        window.open('/chat_lobby', '_blank');
+    });
 });

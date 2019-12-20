@@ -40,14 +40,10 @@
                     <img src="data:<%= profile_photo_content_type_top_left %>;base64,<%= profile_photo_top_left %>" class="profile_photo_top_left" alt="Unknown error">
                 </th>
                 <th>
-                    <form action="/my_message" method="get">
-                        <input type="submit" id="my_message" value="My Message" />
-                    </form>
+                    <input type="button" onclick="window.open('/my_message', '_blank')" id="my_message" value="My Message">
                 </th>
                 <th>
-                    <form action="/logout" method="get">
-                        <input type="submit" id="logout" value="Log Out" />
-                    </form>
+                    <input type="button" onclick="window.open('/logout', '_self')" id="logout" value="Log Out">
                 </th>
             </tr>
         </table>

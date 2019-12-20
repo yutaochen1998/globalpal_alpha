@@ -14,9 +14,10 @@
     "ejs-locals": "^1.0.2",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6",
+    "express-ws": "^4.0.0",
     "moment": "^2.24.0",
     "mongoose": "^5.8.1",
-    "websocket": "^1.0.31"
+    "ws": "^7.2.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",

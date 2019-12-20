@@ -23,11 +23,7 @@ function trimMessage(message_box, message_object) {
 }
 
 function selectPipeline(gender, userID) {
-    if (gender === "all") {
-        return {email: {$ne: userID}};
-    } else {
-        return {gender: gender, email: {$ne: userID}};
-    }
+    return (gender === "all")?{email: {$ne: userID}}:{gender: gender, email: {$ne: userID}}
 }
 
 module.exports = {getAge, trimMessage, selectPipeline};

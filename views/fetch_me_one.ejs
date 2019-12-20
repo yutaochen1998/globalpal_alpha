@@ -1,6 +1,6 @@
 <% layout('layout_main') -%>
 <% stylesheet('../stylesheets/style.css') -%>
-<% script('../javascripts/wss_test.js') -%>
+<% script('../javascripts/whisper_like_interact.js') -%>
 
 <div class="container">
     <div class="row">
@@ -33,10 +33,6 @@
                 </div>
 
                 <div class="col-xl-6">
-                    <p class="info">Profile photo:</p>
-                    <img src="data:<%= profile_photo_content_type %>;base64,<%= profile_photo %>"
-                         class="profile_photo" alt="Unknown error"><br><br>
-
                     <p class="info">Showcase photo:</p>
                     <img src="data:<%= showcase_photo_content_type %>;base64,<%= showcase_photo %>"
                          class="showcase_photo" alt="Unknown error"><br><br>
@@ -44,20 +40,16 @@
                     <p class="info">Send a message, hit a like, or start a chat!:</p>
                     <div class="row">
                         <div class="col-xl-8">
-                            <form action="/whisper" method="post" id="whisper">
-                                <textarea rows="2" name="whisper"
-                                          placeholder="Hi! Would you like a cup of tea?" required ></textarea>
-                            </form>
+                            <textarea rows="2" name="whisper" id="whisper_message"
+                                      placeholder="Hi! Would you like a cup of tea?" required ></textarea>
                         </div>
 
                         <div class="col-xl-2">
-                            <input class="interact" type="submit" value="💌" form="whisper">
+                            <input class="interact" type="button" id="whisper_button" value="💌">
                         </div>
 
                         <div class="col-xl-2">
-                            <form action="/like" method="get" id="like">
-                                <input class="interact" type="submit" value="<%= like_icon %>" form="like">
-                            </form>
+                            <input class="interact" type="button" id="like_button" value="<%= like_icon %>">
                         </div>
                     </div>
                 </div>
@@ -68,15 +60,11 @@
                 </div>
 
                 <div class="col-xl-4">
-                    <form action="/fetch_me_one_page" method="get">
-                        <input type="submit" value="Return">
-                    </form>
+                    <input type="button" onclick="window.open('/fetch_me_one_page', '_self')" value="Return">
                 </div>
 
                 <div class="col-xl-4">
-                    <form action="/fetch_me_one_loop" method="get">
-                        <input type="submit" value="Next One">
-                    </form>
+                    <input type="button" onclick="window.open('/fetch_me_one_loop', '_self')" value="Next One">
                 </div>
 
                 <div class="col-xl-2">

@@ -83,7 +83,7 @@ textarea {
     border: 2px solid #767474;
 }
 
-input[type=submit] {
+input[type=submit], input[type=button] {
     font-family: 'Helvetica', serif;
     font-size: 20px;
     width: 100%; 

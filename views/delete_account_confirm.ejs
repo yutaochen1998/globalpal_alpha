@@ -7,16 +7,11 @@
         </div>
 
         <div class="col-xl-6 main">
-            <form action="javascript:history.back()" method="get">
-                <h1>Delete account confirm</h1>
-                <p class="warning">*Warning* The process is permanent and CANNOT be recovered!
-                    Are you sure you want to delete your account and all data?</p>
-                <input type="submit" value="Cancel"><br>
-            </form>
-
-            <form action="/delete_account" method="get">
-                <input class="delete" type="submit" value="Delete anyway">
-            </form>
+            <h1>Delete account confirm</h1>
+            <p class="warning">*Warning* The process is permanent and CANNOT be recovered!
+                Are you sure you want to delete your account and all data?</p>
+            <input type="button" onclick="history.back()" value="Cancel"><br>
+            <input class="delete" type="button" onclick="window.open('/delete_account', '_self')" value="Delete anyway">
         </div>
 
         <div class="col-xl-3">

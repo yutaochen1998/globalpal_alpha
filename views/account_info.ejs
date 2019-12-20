@@ -30,21 +30,15 @@
 
             <div class="row">
                 <div class="col-xl-4">
-                    <form action="/change_password_page" method="get">
-                        <input type="submit" value="Change Password">
-                    </form>
+                    <input type="button" onclick="window.open('/change_password_page', '_self')" value="Change Password">
                 </div>
 
                 <div class="col-xl-4">
-                    <form action="/start_friendship" method="get">
-                        <input type="submit" value="Return">
-                    </form>
+                    <input type="button" onclick="window.open('/start_friendship', '_self')" value="Return">
                 </div>
 
                 <div class="col-xl-4">
-                    <form action="/delete_account_confirm" method="get">
-                        <input class="delete" type="submit" value="Delete Account">
-                    </form>
+                    <input class="delete" type="button" onclick="window.open('/delete_account_confirm', '_self')" value="Delete Account">
                 </div>
             </div>
         </div>

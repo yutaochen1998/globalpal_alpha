@@ -10,15 +10,11 @@
             <h1>My Message</h1>
             <div class="row">
                 <div class="col-xl-6">
-                    <form action="/start_friendship" method="get">
-                        <input type="submit" value="Back">
-                    </form>
+                    <input type="button" onclick="window.open('/start_friendship', '_self')" value="Back">
                 </div>
 
                 <div class="col-xl-6">
-                    <form action="/clear_message" method="get">
-                        <input class="delete" type="submit" value="Clear Message">
-                    </form>
+                    <input class="delete" type="button" onclick="window.open('/clear_message', '_self')" value="Clear Message">
                 </div>
             </div><br>
 
