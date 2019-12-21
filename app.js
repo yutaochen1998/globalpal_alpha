@@ -19,6 +19,7 @@ mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
+//Your connection string here
 mongoose.connect('mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=false');
 
 //set up mongodb connection
@@ -47,15 +48,17 @@ app.engine('ejs', engine);
 app.set('views',__dirname + '/views');
 app.set('view engine', 'ejs');
 
-//set up websocket service
-let connections = {};
+//set up websocket whisper & like service
+let connections_wnl = {};
 app.ws('/websocket_whisper_like', (ws, req) => {
 
 	let email = req.session.userID;
 	let email_search = req.session.userID_search;
 
 	//push connected instance
-	connections[email] = ws;
+	connections_wnl[email] = ws;
+	console.log("Connection to interaction service established");
+
 	ws.on('message', data => {
 		db.collection('Accounts').findOne({email: email_search}, function (err, result_search) {
 			if (err) throw err;
@@ -66,7 +69,7 @@ app.ws('/websocket_whisper_like', (ws, req) => {
 			if (JSON.parse(data).whisper) {
 				let message_box = result_search.message_box;
 				tools.trimMessage(message_box,
-					{time_stamp: moment().format('YYYY-MM-DD'),
+					{time_stamp: moment().format('MMMM Do YYYY, h:mm a'),
 						userID: email, message: JSON.parse(data).message});
 				db.collection("Accounts").updateOne({email: email_search},
 					{$set: {message_box: message_box}}, function(err) {
@@ -98,7 +101,7 @@ app.ws('/websocket_whisper_like', (ws, req) => {
 							like_icon = "💕";
 							message = "You matched with " + result_search.first_name + "!\nCheck your message box.";
 							tools.trimMessage(message_box,
-								{time_stamp: moment().format('YYYY-MM-DD'),
+								{time_stamp: moment().format('MMMM Do YYYY, h:mm a'),
 									userID: 'System Message',
 									message: 'You matched with ' +
 										result_search.first_name + ' ' +
@@ -112,7 +115,7 @@ app.ws('/websocket_whisper_like', (ws, req) => {
 								});
 							message_box = result_search.message_box;
 							tools.trimMessage(message_box,
-								{time_stamp: moment().format('YYYY-MM-DD'),
+								{time_stamp: moment().format('MMMM Do YYYY, h:mm a'),
 									userID: 'System Message',
 									message: 'You matched with ' +
 										result.first_name + ' ' +
@@ -144,24 +147,32 @@ app.ws('/websocket_whisper_like', (ws, req) => {
 	});
 	ws.on('close', () => {
 		//delete disconnected instance
-		delete connections[email];
+		delete connections_wnl[email];
+		console.log("Connection to interaction service closed");
 	});
 });
 
-//provide chat service
-app.ws('/websocket_service', (ws, req) => {
+//set up websocket chat lobby service
+let connections_cl = {};
+app.ws('/websocket_chat_lobby', (ws, req) => {
+
 	//push connected instance
-	connections[req.session.userID] = ws;
+	connections_cl[req.session.userID] = ws;
+	console.log("Connection to chat lobby established");
+
 	ws.on('message', message => {
-		message = "User ID: " + req.session.userID + "\nMessage: " + message;
-		console.log('Message received: \n' + message);
-		Object.values(connections).forEach(function (socket) {
-			socket.send(message);
+		console.log('Message received: ' + message);
+		message = {time_stamp: moment().format('h:mm:ss a'), userID: req.session.userID, message: message};
+		//broadcast to all connected clients
+		Object.values(connections_cl).forEach(function (socket) {
+			socket.send(JSON.stringify(message));
 		});
 	});
+
 	ws.on('close', () => {
 		//delete disconnected instance
-		delete connections[req.session.userID];
+		delete connections_cl[req.session.userID];
+		console.log("Connection to chat lobby closed");
 	});
 });
 

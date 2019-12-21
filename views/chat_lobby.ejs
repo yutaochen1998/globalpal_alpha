@@ -1,4 +1,53 @@
 <% layout('layout_main') -%>
 <% stylesheet('../stylesheets/style.css') -%>
+<% script('../javascripts/chat_lobby_service.js') -%>
 
+<div class="container">
+    <div class="row">
+        <div class="col-xl-2">
+        </div>
+
+        <div class="col-xl-8">
+            <h1>Chat Lobby</h1>
+        </div>
+
+        <div class="col-xl-2">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-2">
+        </div>
+
+        <div class="col-xl-8 main">
+            <div class="row">
+                <div class="col-xl-3">
+                    <input type="button" onclick="window.open('/start_friendship', '_self')" value="Return">
+                </div>
+
+                <div class="col-xl-3">
+                    <input class="delete" type="button" id="clear_button" value="Clear">
+                </div>
+
+                <div class="col-xl-6">
+                </div>
+            </div>
+
+            <div id="chat_window">*Welcome to the chat lobby!*</div><br>
+
+            <div class="row">
+                <div class="col-xl-9">
+                    <textarea rows="2" id="chat_message" placeholder="Type a message" required></textarea>
+                </div>
+
+                <div class="col-xl-3">
+                    <input type="button" id="chat_button" value="Send">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2">
+        </div>
+    </div>
+</div>
 

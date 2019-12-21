@@ -28,20 +28,23 @@ p.warning {
 }
 
 .profile_photo_top_left {
-    max-width: 75px;
-    max-height: 75px;
+    width: 75px;
+    height: 75px;
+    object-fit: contain;
     margin: 10px 10px;
     border: 3px solid #73AD21;
 }
 
 .profile_photo {
-    max-width: 75px;
-    max-height: 75px;
+    width: 75px;
+    height: 75px;
+    object-fit: contain;
 }
 
 .showcase_photo {
-    max-width: 500px;
-    max-height: 500px;
+    width: 500px;
+    height: 500px;
+    object-fit: contain;
 }
 
 #welcome_title {
@@ -91,7 +94,7 @@ input[type=submit], input[type=button] {
     border: none; 
     color: white; 
     padding: 16px 8px;
-    margin: 4px 4px;
+    margin: 4px 0;
     border-radius: 10px; 
 }
 
@@ -136,4 +139,19 @@ label.gender_label {
 
 #gender_label_all {
     color: #808080;
+}
+
+#chat_window {
+    font-family: 'Helvetica', serif;
+    font-size: 20px;
+    height: 550px;
+    width: 100%;
+    overflow: auto;
+    overflow-wrap: break-word;
+    border: 5px solid yellowgreen;
+    padding: 2%;
+}
+
+#chat_button {
+    background-color: #73AD21;
 }
