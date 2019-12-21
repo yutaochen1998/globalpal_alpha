@@ -19,7 +19,6 @@ mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
-//Your connection string here
 mongoose.connect('mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=false');
 
 //set up mongodb connection
@@ -57,7 +56,7 @@ app.ws('/websocket_whisper_like', (ws, req) => {
 
 	//push connected instance
 	connections_wnl[email] = ws;
-	console.log("Connection to interaction service established");
+	console.log("Client connected to interaction service, user ID: " + email);
 
 	ws.on('message', data => {
 		db.collection('Accounts').findOne({email: email_search}, function (err, result_search) {
@@ -77,7 +76,7 @@ app.ws('/websocket_whisper_like', (ws, req) => {
 						if (err) throw err;
 					});
 				message = "Whisper sent to "  + result_search.first_name + "!";
-				console.log('Message box update successful');
+				console.log('Message box update successful, target user ID: ' + email_search);
 				ws.send(JSON.stringify({whisper: true, message: message}));
 			}
 
@@ -128,7 +127,7 @@ app.ws('/websocket_whisper_like', (ws, req) => {
 								{$set: {message_box: message_box}}, function(err) {
 									if (err) throw err;
 								});
-							console.log("Matched message sent");
+							console.log("Matched message sent, user ID: " + email + ", target user ID: " + email_search);
 						}
 					} else {
 						//update my like box to cancel like
@@ -140,7 +139,7 @@ app.ws('/websocket_whisper_like', (ws, req) => {
 						{$set: {like_box: like_box}}, function(err) {
 							if (err) throw err;
 						});
-					console.log("Like box updated");
+					console.log("Like box updated, user ID: " + email);
 					ws.send(JSON.stringify({like: true, like_icon: like_icon, message: message}));
 				});
 			}
@@ -149,23 +148,27 @@ app.ws('/websocket_whisper_like', (ws, req) => {
 	ws.on('close', () => {
 		//delete disconnected instance
 		delete connections_wnl[email];
-		console.log("Connection to interaction service closed");
+		console.log("Client disconnected to interaction service, user ID: " + email);
 	});
 });
 
 //set up websocket chat lobby service
-let connections_cl = {};
+let connections_cl = {Europe: {}, America: {}, Asia: {}};
 app.ws('/websocket_chat_lobby', (ws, req) => {
 
-	//push connected instance
-	connections_cl[req.session.userID] = ws;
-	console.log("Connection to chat lobby established");
+	const channel_select = req.session.channel_select;
+	const userID = req.session.userID;
 
+	//push connected instance
+	connections_cl[channel_select][userID] = ws;
+	console.log("Client connected to chat lobby @" + channel_select + ", user ID: " + userID);
 	ws.on('message', data => {
-		//broadcast to all connected clients
+
 		const data_parsed = JSON.parse(data);
+
+		//broadcast to all connected clients within specific region
 		if (data_parsed.chat) {
-			Object.values(connections_cl).forEach(function (socket) {
+			Object.values(connections_cl[channel_select]).forEach(function (socket) {
 				socket.send(JSON.stringify({chat: true,
 					time_stamp: moment().format('h:mm:ss a'),
 					userID: req.session.userID,
@@ -173,24 +176,38 @@ app.ws('/websocket_chat_lobby', (ws, req) => {
 			});
 		}
 		if (data_parsed.current_online) {
-			ws.send(JSON.stringify({current_online: true, number: Object.keys(connections_cl).length}));
+			ws.send(JSON.stringify({current_online: true, number: Object.keys(connections_cl[channel_select]).length}));
 		}
 	});
 
 	ws.on('close', () => {
 		//delete disconnected instance
-		delete connections_cl[req.session.userID];
-		console.log("Connection to chat lobby closed");
+		delete connections_cl[channel_select][userID];
+		console.log("Client disconnected to chat lobby @" + channel_select + ", user ID: " + userID);
 	});
 });
 
 //render chat lobby page
-app.get('/chat_lobby', function (req, res) {
+app.post('/chat_lobby', function (req, res) {
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
-		//add more needed info here
+		req.session.channel_select = req.body.channel_select;
 		res.render('chat_lobby', {
 			title: 'Chat lobby',
+			channel_select: req.session.channel_select,
+
+			profile_photo_content_type_top_left: result.profile_photo.content_type,
+			profile_photo_top_left: result.profile_photo.data
+		});
+	});
+});
+
+//render chat lobby channel selection page
+app.get('/chat_lobby_channel', function (req, res) {
+	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
+		if (err) throw err;
+		res.render('chat_lobby_channel', {
+			title: 'Select your channel',
 
 			profile_photo_content_type_top_left: result.profile_photo.content_type,
 			profile_photo_top_left: result.profile_photo.data
@@ -202,7 +219,7 @@ app.get('/chat_lobby', function (req, res) {
 app.get('/fetch_me_one_loop', function (req, res) {
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
-		//add more needed info here
+		//*WARNING* There must be al least 1 accounts in each gender (male/female) excluding yourself to make sure this doesn't crash
 		db.collection('Accounts').aggregate([
 			{$match: tools.selectPipeline(req.session.fetch_gender, req.session.userID)},
 			{$sample: {size: 1}}
@@ -218,7 +235,7 @@ app.get('/fetch_me_one_loop', function (req, res) {
 				}
 			}
 			req.session.userID_search = result_random.email;
-			res.render('fetch_me_one', {
+			res.render('fetch_me_one_loop', {
 				title: "Let's make some friends",
 				email: result_random.email,
 				first_name: result_random.first_name,
@@ -244,17 +261,16 @@ app.get('/fetch_me_one_loop', function (req, res) {
 });
 
 //handle fetch me one request
-app.post('/fetch_me_one', function (req, res) {
+app.post('/fetch_me_one_select', function (req, res) {
 	req.session.fetch_gender = req.body.gender_select;
 	res.redirect('/fetch_me_one_loop');
 });
 
-//render fetch me one page
-app.get('/fetch_me_one_page', function (req, res) {
+//render fetch me one gender selection page
+app.get('/fetch_me_one_gender', function (req, res) {
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
-		//add more needed info here
-		res.render('fetch_me_one_page', {
+		res.render('fetch_me_one_gender', {
 			title: 'Choose your interest',
 
 			profile_photo_content_type_top_left: result.profile_photo.content_type,
@@ -275,22 +291,25 @@ app.get('/clear_message', function (req, res) {
 
 //render my message page
 app.get('/my_message', function (req, res) {
-
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
 
 		const message_box = result.message_box;
 		let message_list = '';
 
-		message_box.forEach(function (value) {
-			message_list += '🔻' +
-				value.time_stamp +
-				' > ' +
-				value.userID +
-				'🔻<br>' +
-				value.message +
-				'<br><br>';
-		});
+		if (message_box.length > 0) {
+			message_box.forEach(function (value) {
+				message_list += '🔻' +
+					value.time_stamp +
+					' > ' +
+					value.userID +
+					'🔻<br>' +
+					value.message +
+					'<br><br>';
+			});
+		} else {
+			message_list += 'Wow, such empty.';
+		}
 		res.render('my_message', {
 			title: 'My message',
 			message_list: message_list,
@@ -363,7 +382,6 @@ app.post('/search_by_email', function(req, res) {
 app.get('/search_by_email_page', function(req, res) {
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
-		//add more needed info here
 		res.render('search_by_email_page', {
 			title: 'Search by email',
 
@@ -375,7 +393,6 @@ app.get('/search_by_email_page', function(req, res) {
 
 //handle edit photo request
 app.post('/photo_edit', function(req, res) {
-
 	if (req.files) {
 		if (req.files.profile_photo_edit) {
 			db.collection("Accounts").updateOne({email: req.session.userID},
@@ -400,7 +417,6 @@ app.post('/photo_edit', function(req, res) {
 
 //handle edit personal info request
 app.post('/personal_info_edit', function(req, res) {
-
 	db.collection("Accounts").updateOne({email: req.session.userID},
 		{$set: {first_name: req.body.first_name_edit,
 				last_name: req.body.last_name_edit,
@@ -424,7 +440,6 @@ app.post('/personal_info_edit', function(req, res) {
 app.get('/personal_info_edit_page', function(req, res) {
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
-		//add more needed info here
 		res.render('personal_info_edit_page', {
 			title: 'Personal info edit page',
 			first_name: result.first_name,
@@ -458,14 +473,13 @@ app.get('/delete_account', function(req, res) {
 		if (err) throw err;
 	});
 	console.log('Account delete successful');
-	res.redirect('/');
+	res.redirect('/logout');
 });
 
 //render account delete confirm page
 app.get('/delete_account_confirm', function (req, res) {
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
-		//add more needed info here
 		res.render('delete_account_confirm', {
 			title: 'Confirm before you go',
 
@@ -479,11 +493,11 @@ app.get('/delete_account_confirm', function (req, res) {
 app.post('/change_password', function(req, res) {
 
 	let password = req.body.password_change;
+	//hash password before comparison
 	password = crypto.createHmac('sha1', password).update(password).digest('hex');
 
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
-		//add more needed info here
 		if (password === result.password) {
 			res.render('change_password_result',
 				{title: 'Password change failed!',
@@ -518,7 +532,6 @@ app.post('/change_password', function(req, res) {
 app.get('/change_password_page', function(req, res) {
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
-		//add more needed info here
 		res.render('change_password_page', {
 			title: 'Change password',
 
@@ -532,7 +545,6 @@ app.get('/change_password_page', function(req, res) {
 app.get('/account_info', function(req, res) {
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
-		//add more needed info here
 		res.render('account_info', {
 			title: 'Account info',
 			userID: req.session.userID,
@@ -550,7 +562,6 @@ app.get('/account_info', function(req, res) {
 app.get('/personal_info', function(req, res) {
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
-		//add more needed info here
 		res.render('personal_info', {
 			title: 'Personal info',
 			first_name: result.first_name,
@@ -585,7 +596,7 @@ app.get('/logout', function(req, res) {
 	res.redirect('/');
 });
 
-//render main page
+//render main activity page
 app.get('/start_friendship', function(req, res) {
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
@@ -609,13 +620,14 @@ app.post('/login', function(req, res) {
 			console.log("Account doesn't exists");
 			res.render('login_failed', {title: 'Login failed', error_message: "Account doesn't exists!"});
 		} else {
+			//hash password before comparing with that in the database
 			password = crypto.createHmac('sha1', password).update(password).digest('hex');
 			if (result.password !== password) {
 				console.log("Password incorrect");
 				res.render('login_failed', {title: 'Login failed', error_message: "Password incorrect!"});
 			} else {
 				req.session.userID = email;
-				console.log("Login successful, userID: " + req.session.userID);
+				console.log("Login successful, user ID: " + req.session.userID);
 				res.render('start_friendship', {
 					title: 'GlobalPal',
 					user_name: result.first_name,
@@ -641,6 +653,7 @@ app.post('/signup', function(req, res) {
 	db.collection('Accounts').findOne({email: email}, function (err, result) {
 		if (!result) {
 
+			//hash password before saving to the database
 			password = crypto.createHmac('sha1', password).update(password).digest('hex');
 
 			const new_account = {

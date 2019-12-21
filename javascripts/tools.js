@@ -1,4 +1,5 @@
 function getAge(birthday_raw) {
+    //convert YYYY-MM-DD format date into age
     const moment = require('moment');
     let today = moment().format('YYYY-MM-DD').split("-");
     let birthday = birthday_raw.split("-");
@@ -15,14 +16,15 @@ function getAge(birthday_raw) {
 }
 
 function trimMessage(message_box, message_object) {
+    //trim message box and limit to 20 messages
     message_box.push(message_object);
-    //no more than 20 messages
     if (message_box.length > 20) {
         message_box.shift();
     }
 }
 
 function selectPipeline(gender, userID) {
+    //return the database search pipeline based on selected gender
     return (gender === "all")?{email: {$ne: userID}}:{gender: gender, email: {$ne: userID}}
 }
 

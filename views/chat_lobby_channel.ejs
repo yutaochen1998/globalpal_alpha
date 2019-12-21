@@ -1,0 +1,58 @@
+<% layout('layout_main') -%>
+<% stylesheet('../stylesheets/style.css') -%>
+
+<div class="container">
+    <div class="row">
+        <div class="col-xl-2">
+        </div>
+
+        <div class="col-xl-8">
+            <h1>Please select your channel: </h1><br>
+        </div>
+
+        <div class="col-xl-2">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl main">
+            <form action="/chat_lobby" method="post" id="channel_select">
+                <div class="row">
+                    <div class="col-xl-4">
+                        <input class="channel_select" type="radio" name="channel_select"
+                               id="channel_select_eu" value="Europe" checked="checked">
+                        <label class="channel_label" id="channel_label_eu" for="channel_select_eu">Europe</label>
+                    </div>
+
+                    <div class="col-xl-4">
+                        <input class="channel_select" type="radio" name="channel_select"
+                               id="channel_select_us" value="America">
+                        <label class="channel_label" id="channel_label_us" for="channel_select_us">America</label>
+                    </div>
+
+                    <div class="col-xl-4">
+                        <input class="channel_select" type="radio" name="channel_select"
+                               id="channel_select_as" value="Asia">
+                        <label class="channel_label" id="channel_label_as" for="channel_select_as">Asia</label>
+                    </div>
+                </div><br>
+            </form>
+
+            <div class="row">
+                <div class="col-xl-2">
+                </div>
+
+                <div class="col-xl-4">
+                    <input type="button" onclick="window.open('/start_friendship', '_self')" value="Return">
+                </div>
+
+                <div class="col-xl-4">
+                    <input type="submit" value="Connect!" form="channel_select">
+                </div>
+
+                <div class="col-xl-2">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

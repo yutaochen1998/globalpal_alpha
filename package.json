@@ -16,7 +16,7 @@
     "express-fileupload": "^1.1.6",
     "express-ws": "^4.0.0",
     "moment": "^2.24.0",
-    "mongoose": "^5.8.1",
+    "mongoose": "^5.8.2",
     "ws": "^7.2.1"
   },
   "devDependencies": {

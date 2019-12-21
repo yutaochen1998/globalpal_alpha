@@ -152,12 +152,12 @@ input.interact:hover {
     background-color: #804080;
 }
 
-input.gender_select {
+input.gender_select, input.channel_select {
     width: 4em;
     height: 4em;
 }
 
-label.gender_label {
+label.gender_label, label.channel_label {
     font-family: Impact, Charcoal, sans-serif;
     font-size: 80px;
 }
@@ -206,4 +206,5 @@ label.gender_label {
 
 .banner {
     width: 100%;
+    transition: 0.5s;
 }
