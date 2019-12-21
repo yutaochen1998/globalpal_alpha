@@ -31,8 +31,14 @@ p.warning {
     width: 75px;
     height: 75px;
     object-fit: contain;
+    cursor: pointer;
     margin: 10px 10px;
-    border: 3px solid #73AD21;
+    border: 5px solid #73AD21;
+    transition: 0.5s;
+}
+
+.profile_photo_top_left:hover {
+    filter: brightness(50%);
 }
 
 .profile_photo {
@@ -45,6 +51,11 @@ p.warning {
     width: 500px;
     height: 500px;
     object-fit: contain;
+    transition: 0.5s;
+}
+
+.showcase_photo:hover {
+    transform: scale(1.1);
 }
 
 #welcome_title {
@@ -95,12 +106,22 @@ input[type=submit], input[type=button] {
     color: white; 
     padding: 16px 8px;
     margin: 4px 0;
-    border-radius: 10px; 
+    border-radius: 10px;
+    transition: 0.5s;
+}
+
+input[type=submit]:hover, input[type=button]:hover {
+    background-color: #004080;
+    transform: scale(1.1);
+    backface-visibility: hidden;
 }
 
 #my_message {
     width: 140px;
     background-color: #73AD21;
+}
+#my_message:hover {
+    background-color: #3a5711;
 }
 
 #logout {
@@ -108,8 +129,16 @@ input[type=submit], input[type=button] {
     background-color: #ff8000;
 }
 
+#logout:hover {
+    background-color: #804000;
+}
+
 input.delete {
     background-color: #ff0000;
+}
+
+input.delete:hover {
+    background-color: #800000;
 }
 
 input.interact {
@@ -117,6 +146,10 @@ input.interact {
     font-size: 30px;
     padding: 8px 8px;
     background-color: #ff80ff;
+}
+
+input.interact:hover {
+    background-color: #804080;
 }
 
 input.gender_select {
@@ -141,9 +174,20 @@ label.gender_label {
     color: #808080;
 }
 
+#message_window {
+    font-family: 'Helvetica', serif;
+    font-size: 16px;
+    height: 550px;
+    width: 100%;
+    overflow: auto;
+    overflow-wrap: break-word;
+    border: 5px solid yellowgreen;
+    padding: 2%;
+}
+
 #chat_window {
     font-family: 'Helvetica', serif;
-    font-size: 20px;
+    font-size: 18px;
     height: 550px;
     width: 100%;
     overflow: auto;
@@ -154,4 +198,12 @@ label.gender_label {
 
 #chat_button {
     background-color: #73AD21;
+}
+
+#chat_button:hover {
+    background-color: #3a5711;
+}
+
+.banner {
+    width: 100%;
 }

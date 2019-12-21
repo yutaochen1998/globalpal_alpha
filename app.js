@@ -282,14 +282,14 @@ app.get('/my_message', function (req, res) {
 		const message_box = result.message_box;
 		let message_list = '';
 
-		message_box.forEach(function (value, index) {
-			message_list += '<p>🔻' +
-				message_box[index].time_stamp +
+		message_box.forEach(function (value) {
+			message_list += '🔻' +
+				value.time_stamp +
 				' > ' +
-				message_box[index].userID +
+				value.userID +
 				'🔻<br>' +
-				message_box[index].message +
-				'</p><br>';
+				value.message +
+				'<br><br>';
 		});
 		res.render('my_message', {
 			title: 'My message',

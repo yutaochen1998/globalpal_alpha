@@ -26,9 +26,9 @@ $(document).ready(function() {
 
         if (data_parsed.chat) {
             chat_window.prepend('🔻' +
-                    data_parsed.time_stamp + ' > ' +
-                    data_parsed.userID + '🔻' +
-                    '<br>' + data_parsed.message + '<br>');
+                data_parsed.time_stamp + ' > ' +
+                data_parsed.userID + '🔻' +
+                '<br>' + (data_parsed.message) + '<br><br>');
         }
         if (data_parsed.current_online) {
             current_online.text("Current online: " + data_parsed.number);
