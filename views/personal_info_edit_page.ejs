@@ -18,7 +18,7 @@
         <div class="col-xl main">
             <div class="row">
                 <div class="col-xl-6">
-                    <form action="/personal_info_edit" method="post" id="personal_info_edit">
+                    <form action="/personal_info_edit" method="post">
                         <label for="first_name_edit">First name</label>
                         <input class="box" type="text" name="first_name_edit" id="first_name_edit"
                                value="<%= first_name %>" required /><br>
@@ -114,7 +114,20 @@
 
                         <label for="facebook_link_edit">Facebook Link: </label>
                         <textarea rows="4" name="facebook_link_edit"
-                                  id="facebook_link_edit" required ><%= facebook_link %></textarea>
+                                  id="facebook_link_edit" required ><%= facebook_link %></textarea><br>
+
+                        <div class="row">
+                            <div class="col-xl-2">
+                            </div>
+
+                            <div class="col-xl-8">
+                                <input type="submit" value="Update Info">
+                            </div>
+
+                            <div class="col-xl-2">
+                            </div>
+
+                        </div>
                     </form>
                 </div>
 
@@ -128,25 +141,31 @@
                         <p class="info">Showcase photo:</p>
                         <input type="file" name="showcase_photo_edit" accept="image/*"><br><br>
                         <img src="data:<%= showcase_photo_content_type %>;base64,<%= showcase_photo %>"
-                             class="showcase_photo" alt="Unknown error"><br><br>
-                        <input type="submit" value="Update Photos">
+                             class="showcase_photo" alt="Unknown error"><br>
+                        <div class="row">
+                            <div class="col-xl-2">
+                            </div>
+
+                            <div class="col-xl-8">
+                                <input type="submit" value="Update Photos">
+                            </div>
+
+                            <div class="col-xl-2">
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div><br>
 
             <div class="row">
-                <div class="col-xl-2">
-                </div>
-
                 <div class="col-xl-4">
-                    <input type="submit" value="Submit" form="personal_info_edit">
                 </div>
 
                 <div class="col-xl-4">
                     <input type="button" onclick="history.back()" value="Cancel">
                 </div>
 
-                <div class="col-xl-2">
+                <div class="col-xl-4">
                 </div>
             </div>
         </div>

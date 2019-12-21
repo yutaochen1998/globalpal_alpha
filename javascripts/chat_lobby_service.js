@@ -1,35 +1,41 @@
 $(document).ready(function() {
     const port = 3000;
     const connection = new WebSocket('ws://localhost:' + port + '/websocket_chat_lobby');
-    const chat_window = document.querySelector('#chat_window');
-    const chat_button = document.querySelector('#chat_button');
-    const input = document.querySelector('#chat_message');
-    const clear_button = document.querySelector('#clear_button');
+    const chat_window = $('#chat_window');
+    const chat_button = $('#chat_button');
+    const input = $('#chat_message');
+    const clear_button = $('#clear_button');
+    const current_online = $('#current_online');
 
-    chat_button.onclick = function () {
-        if (input.value.length === 0) {
-            $('<div style="color: red">Message could not be empty!</div>').insertAfter('#chat_message').delay(3000).fadeOut();
+    chat_button.click(function () {
+        if (input.val().length === 0) {
+            input.notify("Message could not be empty!", {className: 'info', position: 'top'});
         } else {
-            connection.send(input.value);
-            input.value = '';
+            connection.send(JSON.stringify({chat: true, message: input.val()}));
+            input.val('');
         }
-        return false;
-    };
+    });
 
-    clear_button.onclick = function () {
-        chat_window.textContent = '*Welcome to the chat lobby!*';
-        return false;
-    };
+    clear_button.click(function () {
+        chat_window.text('*Welcome to the chat lobby!*');
+    });
 
     connection.onmessage = (event) => {
-        chat_window.prepend(
-            document.createTextNode('🔻' +
-                JSON.parse(event.data).time_stamp +
-                ' > ' +
-                JSON.parse(event.data).userID + '🔻'),
-            document.createElement('BR'),
-            document.createTextNode(JSON.parse(event.data).message),
-            document.createElement('BR')
-        );
+
+        const data_parsed = JSON.parse(event.data);
+
+        if (data_parsed.chat) {
+            chat_window.prepend('🔻' +
+                    data_parsed.time_stamp + ' > ' +
+                    data_parsed.userID + '🔻' +
+                    '<br>' + data_parsed.message + '<br>');
+        }
+        if (data_parsed.current_online) {
+            current_online.text("Current online: " + data_parsed.number);
+        }
     };
+
+    $.periodic({period: 2000, decay: 1.0}, function() {
+        connection.send(JSON.stringify({current_online: true}));
+    });
 });

@@ -52,8 +52,8 @@ app.set('view engine', 'ejs');
 let connections_wnl = {};
 app.ws('/websocket_whisper_like', (ws, req) => {
 
-	let email = req.session.userID;
-	let email_search = req.session.userID_search;
+	const email = req.session.userID;
+	const email_search = req.session.userID_search;
 
 	//push connected instance
 	connections_wnl[email] = ws;
@@ -64,13 +64,14 @@ app.ws('/websocket_whisper_like', (ws, req) => {
 			if (err) throw err;
 
 			let message;
+			const data_parsed = JSON.parse(data);
 
 			//update target user's message box and send back a notification
-			if (JSON.parse(data).whisper) {
+			if (data_parsed.whisper) {
 				let message_box = result_search.message_box;
 				tools.trimMessage(message_box,
 					{time_stamp: moment().format('MMMM Do YYYY, h:mm a'),
-						userID: email, message: JSON.parse(data).message});
+						userID: email, message: data_parsed.message});
 				db.collection("Accounts").updateOne({email: email_search},
 					{$set: {message_box: message_box}}, function(err) {
 						if (err) throw err;
@@ -81,7 +82,7 @@ app.ws('/websocket_whisper_like', (ws, req) => {
 			}
 
 			//check both users' like box and send back a notification
-			if (JSON.parse(data).like) {
+			if (data_parsed.like) {
 				db.collection('Accounts').findOne({email: email}, function (err, result) {
 					if (err) throw err;
 
@@ -160,13 +161,20 @@ app.ws('/websocket_chat_lobby', (ws, req) => {
 	connections_cl[req.session.userID] = ws;
 	console.log("Connection to chat lobby established");
 
-	ws.on('message', message => {
-		console.log('Message received: ' + message);
-		message = {time_stamp: moment().format('h:mm:ss a'), userID: req.session.userID, message: message};
+	ws.on('message', data => {
 		//broadcast to all connected clients
-		Object.values(connections_cl).forEach(function (socket) {
-			socket.send(JSON.stringify(message));
-		});
+		const data_parsed = JSON.parse(data);
+		if (data_parsed.chat) {
+			Object.values(connections_cl).forEach(function (socket) {
+				socket.send(JSON.stringify({chat: true,
+					time_stamp: moment().format('h:mm:ss a'),
+					userID: req.session.userID,
+					message: data_parsed.message}));
+			});
+		}
+		if (data_parsed.current_online) {
+			ws.send(JSON.stringify({current_online: true, number: Object.keys(connections_cl).length}));
+		}
 	});
 
 	ws.on('close', () => {
@@ -271,7 +279,7 @@ app.get('/my_message', function (req, res) {
 	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
 		if (err) throw err;
 
-		let message_box = result.message_box;
+		const message_box = result.message_box;
 		let message_list = '';
 
 		message_box.forEach(function (value, index) {
@@ -296,8 +304,8 @@ app.get('/my_message', function (req, res) {
 //handle search by email request
 app.post('/search_by_email', function(req, res) {
 
-	let email = req.session.userID;
-	let email_search = req.body.email_search;
+	const email = req.session.userID;
+	const email_search = req.body.email_search;
 
 	if (email_search === email) {
 		res.redirect('/personal_info');
@@ -592,7 +600,7 @@ app.get('/start_friendship', function(req, res) {
 //handle login request
 app.post('/login', function(req, res) {
 
-	let email = req.body.email_login;
+	const email = req.body.email_login;
 	let password = req.body.password_login;
 
 	db.collection('Accounts').findOne({email: email}, function (err, result) {
@@ -627,7 +635,7 @@ app.get('/login_page', function(req, res) {
 //handle signup request
 app.post('/signup', function(req, res) {
 
-	let email = req.body.email_signup;
+	const email = req.body.email_signup;
 	let password = req.body.password_signup;
 
 	db.collection('Accounts').findOne({email: email}, function (err, result) {
@@ -635,7 +643,7 @@ app.post('/signup', function(req, res) {
 
 			password = crypto.createHmac('sha1', password).update(password).digest('hex');
 
-			let new_account = {
+			const new_account = {
 				first_name: req.body.first_name_signup,
 				last_name: req.body.last_name_signup,
 				email: email,
