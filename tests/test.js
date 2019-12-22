@@ -26,8 +26,8 @@ suite("trimMessage() @ /javascripts/tools.js", function() {
             message_box.push(message_object);
         }
         tools.trimMessage(message_box, message_object);
-        assert.equal(message_box.length, 20, "incorrect when length === 29");
+        assert.equal(message_box.length, 30, "incorrect when length === 29");
         tools.trimMessage(message_box, message_object);
-        assert.equal(message_box.length, 20, "incorrect when length === 30");
+        assert.equal(message_box.length, 30, "incorrect when length === 30");
     })
 });
