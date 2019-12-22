@@ -19,15 +19,15 @@ suite("getAge() @ /javascripts/tools.js", function() {
 });
 
 suite("trimMessage() @ /javascripts/tools.js", function() {
-    test("trimMessage() limits the message box at 20 messages", function () {
+    test("trimMessage() limits the message box at 30 messages", function () {
         let message_box = [];
         const message_object = {message: "test"};
-        for (let i = 0; i < 19; i++) {
+        for (let i = 0; i < 29; i++) {
             message_box.push(message_object);
         }
         tools.trimMessage(message_box, message_object);
-        assert.equal(message_box.length, 20, "incorrect when length === 19");
+        assert.equal(message_box.length, 20, "incorrect when length === 29");
         tools.trimMessage(message_box, message_object);
-        assert.equal(message_box.length, 20, "incorrect when length === 20");
+        assert.equal(message_box.length, 20, "incorrect when length === 30");
     })
 });

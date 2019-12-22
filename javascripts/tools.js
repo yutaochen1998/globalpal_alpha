@@ -16,16 +16,16 @@ function getAge(birthday_raw) {
 }
 
 function trimMessage(message_box, message_object) {
-    //trim message box and limit to 20 messages
+    //trim message box and limit to 30 messages
     message_box.push(message_object);
-    if (message_box.length > 20) {
+    if (message_box.length > 30) {
         message_box.shift();
     }
 }
 
-function selectPipeline(gender, userID) {
-    //return the database search pipeline based on selected gender
-    return (gender === "all")?{email: {$ne: userID}}:{gender: gender, email: {$ne: userID}}
+function selectPipeline(gender, userID, userID_search) {
+    //return the database search pipeline based on selected gender and prevent from getting two same result in a row
+    return (gender === "all")?{email: {$nin: [userID, userID_search]}}:{gender: gender, email: {$nin: [userID, userID_search]}}
 }
 
 module.exports = {getAge, trimMessage, selectPipeline};

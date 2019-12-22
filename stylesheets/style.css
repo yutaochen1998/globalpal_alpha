@@ -55,7 +55,7 @@ p.warning {
 }
 
 .showcase_photo:hover {
-    transform: scale(1.1);
+    transform: scale(1.5);
 }
 
 #welcome_title {
@@ -117,15 +117,19 @@ input[type=submit]:hover, input[type=button]:hover {
 }
 
 #my_message {
-    width: 140px;
+    width: 125px;
     background-color: #73AD21;
 }
 #my_message:hover {
     background-color: #3a5711;
 }
 
+#home {
+    width: 125px;
+}
+
 #logout {
-    width: 140px;
+    width: 125px;
     background-color: #ff8000;
 }
 

@@ -221,7 +221,7 @@ app.get('/fetch_me_one_loop', function (req, res) {
 		if (err) throw err;
 		//*WARNING* There must be al least 1 accounts in each gender (male/female) excluding yourself to make sure this doesn't crash
 		db.collection('Accounts').aggregate([
-			{$match: tools.selectPipeline(req.session.fetch_gender, req.session.userID)},
+			{$match: tools.selectPipeline(req.session.fetch_gender, req.session.userID, req.session.userID_search)},
 			{$sample: {size: 1}}
 		]).next().then(function (result_random) {
 			//set default like icon
@@ -412,7 +412,7 @@ app.post('/photo_edit', function(req, res) {
 		}
 		console.log('Photos update successful');
 	}
-	res.redirect('/personal_info');
+	res.redirect('/personal_info_edit_page');
 });
 
 //handle edit personal info request
@@ -433,7 +433,7 @@ app.post('/personal_info_edit', function(req, res) {
 			if (err) throw err;
 		});
 	console.log('Personal info edit successful');
-	res.redirect('/personal_info');
+	res.redirect('/personal_info_edit_page');
 });
 
 //render personal info edit page

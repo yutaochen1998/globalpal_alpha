@@ -10,13 +10,13 @@
             <h1>My Message</h1>
             <div class="row">
                 <div class="col-xl-6">
-                    <input type="button" onclick="window.open('/start_friendship', '_self')" value="Back">
+                    <input class="delete" type="button" onclick="window.open('/clear_message', '_self')" value="Clear Message">
                 </div>
 
                 <div class="col-xl-6">
-                    <input class="delete" type="button" onclick="window.open('/clear_message', '_self')" value="Clear Message">
+                    <p>Message box will only store the last 30 messages</p>
                 </div>
-            </div><br>
+            </div>
 
             <div id="message_window"><%- message_list -%></div>
         </div>
