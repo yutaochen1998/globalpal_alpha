@@ -209,8 +209,8 @@ app.get('/chat_lobby_channel', function (req, res) {
 		res.render('chat_lobby_channel', {
 			title: 'Select your channel',
 
-			profile_photo_content_type_top_left: result.profile_photo.content_type,
-			profile_photo_top_left: result.profile_photo.data
+			profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+			profile_photo_top_left: req.session.profile_photo_data
 		});
 	});
 });
@@ -250,8 +250,8 @@ app.get('/fetch_me_one_loop', function (req, res) {
 				facebook_link: result_random.facebook_link,
 				like_icon: like_icon,
 
-				profile_photo_content_type_top_left: result.profile_photo.content_type,
-				profile_photo_top_left: result.profile_photo.data,
+				profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+				profile_photo_top_left: req.session.profile_photo_data,
 
 				showcase_photo_content_type: result_random.showcase_photo.content_type,
 				showcase_photo: result_random.showcase_photo.data
@@ -268,14 +268,11 @@ app.post('/fetch_me_one_select', function (req, res) {
 
 //render fetch me one gender selection page
 app.get('/fetch_me_one_gender', function (req, res) {
-	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
-		if (err) throw err;
-		res.render('fetch_me_one_gender', {
-			title: 'Choose your interest',
+	res.render('fetch_me_one_gender', {
+		title: 'Choose your interest',
 
-			profile_photo_content_type_top_left: result.profile_photo.content_type,
-			profile_photo_top_left: result.profile_photo.data
-		});
+		profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+		profile_photo_top_left: req.session.profile_photo_data
 	});
 });
 
@@ -314,8 +311,8 @@ app.get('/my_message', function (req, res) {
 			title: 'My message',
 			message_list: message_list,
 
-			profile_photo_content_type_top_left: result.profile_photo.content_type,
-			profile_photo_top_left: result.profile_photo.data
+			profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+			profile_photo_top_left: req.session.profile_photo_data
 		});
 	});
 });
@@ -336,8 +333,8 @@ app.post('/search_by_email', function(req, res) {
 				if (!result_search) {
 					res.render('search_by_email_failed', {
 						title: "User doesn't exist",
-						profile_photo_content_type_top_left: result.profile_photo.content_type,
-						profile_photo_top_left: result.profile_photo.data
+						profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+						profile_photo_top_left: req.session.profile_photo_data
 					});
 				} else {
 					//set default like icon
@@ -366,8 +363,8 @@ app.post('/search_by_email', function(req, res) {
 						facebook_link: result_search.facebook_link,
 						like_icon: like_icon,
 
-						profile_photo_content_type_top_left: result.profile_photo.content_type,
-						profile_photo_top_left: result.profile_photo.data,
+						profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+						profile_photo_top_left: req.session.profile_photo_data,
 
 						showcase_photo_content_type: result_search.showcase_photo.content_type,
 						showcase_photo: result_search.showcase_photo.data
@@ -380,14 +377,11 @@ app.post('/search_by_email', function(req, res) {
 
 //render search user by email page
 app.get('/search_by_email_page', function(req, res) {
-	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
-		if (err) throw err;
-		res.render('search_by_email_page', {
-			title: 'Search by email',
+	res.render('search_by_email_page', {
+		title: 'Search by email',
 
-			profile_photo_content_type_top_left: result.profile_photo.content_type,
-			profile_photo_top_left: result.profile_photo.data
-		});
+		profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+		profile_photo_top_left: req.session.profile_photo_data
 	});
 });
 
@@ -395,9 +389,11 @@ app.get('/search_by_email_page', function(req, res) {
 app.post('/photo_edit', function(req, res) {
 	if (req.files) {
 		if (req.files.profile_photo_edit) {
+			req.session.profile_photo_data = Buffer.from(req.files.profile_photo_edit.data).toString('base64');
+			req.session.profile_photo_data_content_type = req.files.profile_photo_edit.mimetype;
 			db.collection("Accounts").updateOne({email: req.session.userID},
-				{$set: {profile_photo: {data: Buffer.from(req.files.profile_photo_edit.data).toString('base64'),
-							content_type: req.files.profile_photo_edit.mimetype}
+				{$set: {profile_photo: {data: req.session.profile_photo_data,
+							content_type: req.session.profile_photo_data_content_type}
 					}}, function(err) {
 					if (err) throw err;
 				});
@@ -417,8 +413,9 @@ app.post('/photo_edit', function(req, res) {
 
 //handle edit personal info request
 app.post('/personal_info_edit', function(req, res) {
+	req.session.first_name = req.body.first_name_edit;
 	db.collection("Accounts").updateOne({email: req.session.userID},
-		{$set: {first_name: req.body.first_name_edit,
+		{$set: {first_name: req.session.first_name,
 				last_name: req.body.last_name_edit,
 				gender: req.body.gender_edit,
 				birthday: req.body.birthday_edit,
@@ -442,7 +439,7 @@ app.get('/personal_info_edit_page', function(req, res) {
 		if (err) throw err;
 		res.render('personal_info_edit_page', {
 			title: 'Personal info edit page',
-			first_name: result.first_name,
+			first_name: req.session.first_name,
 			last_name: result.last_name,
 			gender: result.gender,
 			birthday: result.birthday,
@@ -455,11 +452,11 @@ app.get('/personal_info_edit_page', function(req, res) {
 			personal_description: result.personal_description,
 			facebook_link: result.facebook_link,
 
-			profile_photo_content_type_top_left: result.profile_photo.content_type,
-			profile_photo_top_left: result.profile_photo.data,
+			profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+			profile_photo_top_left: req.session.profile_photo_data,
 
-			profile_photo_content_type: result.profile_photo.content_type,
-			profile_photo: result.profile_photo.data,
+			profile_photo_content_type: req.session.profile_photo_content_type,
+			profile_photo: req.session.profile_photo_data,
 
 			showcase_photo_content_type: result.showcase_photo.content_type,
 			showcase_photo: result.showcase_photo.data
@@ -478,14 +475,11 @@ app.get('/delete_account', function(req, res) {
 
 //render account delete confirm page
 app.get('/delete_account_confirm', function (req, res) {
-	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
-		if (err) throw err;
-		res.render('delete_account_confirm', {
-			title: 'Confirm before you go',
+	res.render('delete_account_confirm', {
+		title: 'Confirm before you go',
 
-			profile_photo_content_type_top_left: result.profile_photo.content_type,
-			profile_photo_top_left: result.profile_photo.data
-		});
+		profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+		profile_photo_top_left: req.session.profile_photo_data
 	});
 });
 
@@ -505,8 +499,8 @@ app.post('/change_password', function(req, res) {
 					button_action: 'javascript:history.back()',
 					button_value: 'Return',
 
-					profile_photo_content_type_top_left: result.profile_photo.content_type,
-					profile_photo_top_left: result.profile_photo.data
+					profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+					profile_photo_top_left: req.session.profile_photo_data
 				});
 			console.log("Same password, failed to commit");
 		} else {
@@ -520,8 +514,8 @@ app.post('/change_password', function(req, res) {
 					button_action: '/logout',
 					button_value: 'Logout',
 
-					profile_photo_content_type_top_left: result.profile_photo.content_type,
-					profile_photo_top_left: result.profile_photo.data
+					profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+					profile_photo_top_left: req.session.profile_photo_data
 				});
 			console.log("Password change successful");
 		}
@@ -530,31 +524,25 @@ app.post('/change_password', function(req, res) {
 
 //render password changing page
 app.get('/change_password_page', function(req, res) {
-	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
-		if (err) throw err;
-		res.render('change_password_page', {
-			title: 'Change password',
+	res.render('change_password_page', {
+		title: 'Change password',
 
-			profile_photo_content_type_top_left: result.profile_photo.content_type,
-			profile_photo_top_left: result.profile_photo.data
-		});
+		profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+		profile_photo_top_left: req.session.profile_photo_data
 	});
 });
 
 //fetch account info and render page
 app.get('/account_info', function(req, res) {
-	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
-		if (err) throw err;
-		res.render('account_info', {
-			title: 'Account info',
-			userID: req.session.userID,
+	res.render('account_info', {
+		title: 'Account info',
+		userID: req.session.userID,
 
-			profile_photo_content_type_top_left: result.profile_photo.content_type,
-			profile_photo_top_left: result.profile_photo.data,
+		profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+		profile_photo_top_left: req.session.profile_photo_data,
 
-			profile_photo_content_type: result.profile_photo.content_type,
-			profile_photo: result.profile_photo.data,
-		});
+		profile_photo_content_type: req.session.profile_photo_content_type,
+		profile_photo: req.session.profile_photo_data,
 	});
 });
 
@@ -564,7 +552,7 @@ app.get('/personal_info', function(req, res) {
 		if (err) throw err;
 		res.render('personal_info', {
 			title: 'Personal info',
-			first_name: result.first_name,
+			first_name: req.session.first_name,
 			last_name: result.last_name,
 			gender: result.gender,
 			age: tools.getAge(result.birthday),
@@ -577,11 +565,11 @@ app.get('/personal_info', function(req, res) {
 			personal_description: result.personal_description,
 			facebook_link: result.facebook_link,
 
-			profile_photo_content_type_top_left: result.profile_photo.content_type,
-			profile_photo_top_left: result.profile_photo.data,
+			profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+			profile_photo_top_left: req.session.profile_photo_data,
 
-			profile_photo_content_type: result.profile_photo.content_type,
-			profile_photo: result.profile_photo.data,
+			profile_photo_content_type: req.session.profile_photo_content_type,
+			profile_photo: req.session.profile_photo_data,
 
 			showcase_photo_content_type: result.showcase_photo.content_type,
 			showcase_photo: result.showcase_photo.data
@@ -598,14 +586,11 @@ app.get('/logout', function(req, res) {
 
 //render main activity page
 app.get('/start_friendship', function(req, res) {
-	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
-		if (err) throw err;
-		res.render('start_friendship', {
-			title: 'GlobalPal',
-			user_name: result.first_name,
-			profile_photo_content_type_top_left: result.profile_photo.content_type,
-			profile_photo_top_left: result.profile_photo.data});
-	});
+	res.render('start_friendship', {
+		title: 'GlobalPal',
+		user_name: req.session.first_name,
+		profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+		profile_photo_top_left: req.session.profile_photo_data});
 });
 
 //handle login request
@@ -627,13 +612,16 @@ app.post('/login', function(req, res) {
 				res.render('login_failed', {title: 'Login failed', error_message: "Password incorrect!"});
 			} else {
 				req.session.userID = email;
+				req.session.first_name = result.first_name;
+				req.session.profile_photo_data = result.profile_photo.data;
+				req.session.profile_photo_content_type = result.profile_photo.content_type;
 				console.log("Login successful, user ID: " + req.session.userID);
 				res.render('start_friendship', {
 					title: 'GlobalPal',
-					user_name: result.first_name,
+					user_name: req.session.first_name,
 
-					profile_photo_content_type_top_left: result.profile_photo.content_type,
-					profile_photo_top_left: result.profile_photo.data});
+					profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+					profile_photo_top_left: req.session.profile_photo_data});
 			}
 		}
 	});
