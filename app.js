@@ -204,14 +204,11 @@ app.post('/chat_lobby', function (req, res) {
 
 //render chat lobby channel selection page
 app.get('/chat_lobby_channel', function (req, res) {
-	db.collection('Accounts').findOne({email: req.session.userID}, function (err, result) {
-		if (err) throw err;
-		res.render('chat_lobby_channel', {
-			title: 'Select your channel',
+	res.render('chat_lobby_channel', {
+		title: 'Select your channel',
 
-			profile_photo_content_type_top_left: req.session.profile_photo_content_type,
-			profile_photo_top_left: req.session.profile_photo_data
-		});
+		profile_photo_content_type_top_left: req.session.profile_photo_content_type,
+		profile_photo_top_left: req.session.profile_photo_data
 	});
 });
 
