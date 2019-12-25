@@ -33,7 +33,7 @@ app.use(express.static(__dirname));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({
-	secret: 'web design is fun',
+	secret: 'coursework is hell',
 	resave: false,
 	saveUninitialized: false,
 	cookie: {secure: false}
