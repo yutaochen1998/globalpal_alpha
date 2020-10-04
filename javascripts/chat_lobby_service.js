@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
     const port = 3000;
-    const connection = new WebSocket('ws://localhost:' + port + '/websocket_chat_lobby');
+    const connection = new WebSocket('ws://192.168.1.245:' + port + '/websocket_chat_lobby');
     const chat_window = $('#chat_window');
     const chat_button = $('#chat_button');
     const input = $('#chat_message');

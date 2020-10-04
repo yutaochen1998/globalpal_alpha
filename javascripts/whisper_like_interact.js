@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
     const port = 3000;
-    const connection = new WebSocket('ws://localhost:' + port + '/websocket_whisper_like');
+    const connection = new WebSocket('ws://192.168.1.245:' + port + '/websocket_whisper_like');
     const whisper_button = $('#whisper_button');
     const like_button = $('#like_button');
     const input = $('#whisper_message');

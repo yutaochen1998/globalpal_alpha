@@ -15,12 +15,12 @@
     "express-fileupload": "^1.1.6",
     "express-ws": "^4.0.0",
     "moment": "^2.24.0",
-    "mongoose": "^5.8.2",
+    "mongoose": "^5.8.9",
     "ws": "^7.2.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "express-session": "^1.17.0",
-    "mocha": "^6.2.2"
+    "mocha": "^7.0.0"
   }
 }
